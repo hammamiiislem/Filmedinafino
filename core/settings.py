@@ -151,13 +151,21 @@ if DEBUG:
     SITE_URL = "http://localhost:8000"
     CORS_ALLOW_ALL_ORIGINS = DEBUG
     ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+     # 1. Badel el Backend bech ywalli SMTP (Vrai envoi)
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_HOST = env("EMAIL_HOST")
-    EMAIL_PORT = env.int("EMAIL_PORT")
-    EMAIL_HOST_USER = env("EMAIL_HOST_USER")
-    EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
-    EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS")
-    EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL")
+    EMAIL_HOST = 'smtp.gmail.com'
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+
+    # 2. Email mte3ek elli bech tab3ath bih
+    EMAIL_HOST_USER = 'islemhamami345@gmail.com'
+
+    # 3. EL KEY (App Password): 
+    # Mat7attech mot de passe mte3ek el 3adi! 
+    # Lezem t'jib "Mot de passe d'application" (16 lettres) men Google.
+    EMAIL_HOST_PASSWORD = 'CihRMB8R5Q37o5zJpdrT' 
+
+    DEFAULT_FROM_EMAIL = 'islemhamami345@gmail.com'
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
