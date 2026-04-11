@@ -76,28 +76,6 @@ class LoginForm(FlowbiteFormMixin, AuthenticationForm):
 
 
 class RegisterForm(FlowbiteFormMixin, forms.ModelForm):
-    password1 = forms.CharField(
-        label=_("Password"),
-        widget=forms.PasswordInput(
-            attrs={
-                "placeholder": _("Create a password"),
-                "autocomplete": "new-password",
-            }
-        ),
-        help_text=_("Use at least 8 characters."),
-        error_messages={"required": _("Password is required.")},
-    )
-    password2 = forms.CharField(
-        label=_("Confirm Password"),
-        widget=forms.PasswordInput(
-            attrs={
-                "placeholder": _("Confirm your password"),
-                "autocomplete": "new-password",
-            }
-        ),
-        error_messages={"required": _("Please confirm your password.")},
-    )
-
     class Meta:
         model = User
         fields = ["username", "email"]
@@ -133,23 +111,14 @@ class RegisterForm(FlowbiteFormMixin, forms.ModelForm):
             },
         }
 
-    def clean(self):
-        data = super().clean()
-        p1, p2 = data.get("password1"), data.get("password2")
-        if p1 and p2 and p1 != p2:
-            self.add_error("password2", _("Passwords do not match."))
-        return data
-
     def save(self, commit=True):
         user = super().save(commit=False)
         user.is_staff = False
-        user.set_password(self.cleaned_data["password1"])
+        # Password will be set in the view
         if commit:
             user.save()
-            UserProfile.objects.update_or_create(
-                user=user,
-                defaults={"user_type": UserProfile.UserType.CLIENT_PARTNER},
-            )
+            # UserProfile is already created by signal 'ensure_profile_exists' in models.py
+            # But we can update it here if needed.
         return user
 
 

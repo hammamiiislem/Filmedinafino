@@ -3,15 +3,21 @@ import strawberry_django
 from strawberry import auto
 from typing import List, Optional
 import math
-from django.db.models import Q
-from django.utils import timezone
 import datetime
 import uuid
+
+from django.db.models import Q
+from django.utils import timezone
 from django.conf import settings
+
+# GraphQL specific imports
 from graphql.validation import NoSchemaIntrospectionCustomRule
 from strawberry.extensions import AddValidationRules
+from strawberry.file_uploads import Upload
 
-
+# Models imports (Nadhamthom f-makan wa7ed)
+from cities_light.models import City, Country
+from shared.models import Page, UserPreference
 from guard.models import (
     Location,
     LocationCategory,
@@ -20,6 +26,8 @@ from guard.models import (
     Event,
     EventCategory,
     Ad,
+    AdClick,
+    EventClick,
     Tip,
     PublicTransport,
     PublicTransportType,
@@ -31,16 +39,18 @@ from guard.models import (
     Partner,
     Sponsor,
     Weekday,
+    ArHistoricalContent,
 )
 
-from cities_light.models import City, Country
-from shared.models import Page, UserPreference
+# Utils w Resolvers
+from shared.utils import send_validation_email
+from events.resolvers import Query as EventQuery, Mutation as EventMutation
 
 
 @strawberry.type
 class ImageFieldType:
     @strawberry.field
-    def url(self, info, root) -> str:
+    def url(self, info:str, root) -> str:
         if not root:
             return ""
         try:
@@ -100,14 +110,23 @@ class WeekdayType:
 
 @strawberry_django.type(Partner)
 class PartnerType:
-    id: auto
+    id: strawberry.ID
     name: auto
+    email: auto
     link: auto
+    # 1. El field name lezem ykoun mta3 el model ("is_verified")
+    is_verified: auto = strawberry_django.field(field_name="is_verified")
+
+    # 2. EL SOLUTION: Zid el field locations hna bch el Playground ya3rfou
+    @strawberry.field
+    def locations(self, root) -> List["LocationType"]:
+        return root.locations.all()
 
     @strawberry.field
-    def image(self, root) -> ImageFieldType:
-        return root.image
-
+    def image(self, root) -> Optional[str]:
+        if root.image:
+            return root.image.url
+        return None
 
 @strawberry_django.type(Sponsor)
 class SponsorType:
@@ -144,6 +163,23 @@ class LocationCategoryType:
     updated_at: auto
 
 
+@strawberry_django.type(ArHistoricalContent)
+class ArHistoricalContentType:
+    id: auto
+    name: auto
+    description: auto
+    is_active: auto
+    created_at: auto
+
+    @strawberry.field
+    def marker_image(self, root) -> ImageFieldType:
+        return root.marker_image
+
+    @strawberry.field
+    def historical_asset(self, root) -> ImageFieldType:
+        return root.historical_asset
+
+
 @strawberry_django.type(Location)
 class LocationType:
     id: auto
@@ -157,11 +193,12 @@ class LocationType:
     story: str
     story_en: str
     story_fr: str
-    open_from: auto = strawberry_django.field(field_name="openFrom")
+    open_from: auto = strawberry_django.field(field_name="openFrom") # Hna 5alliha openFrom khater fil model maktouba haka
     open_to: auto = strawberry_django.field(field_name="openTo")
     admission_fee: auto = strawberry_django.field(field_name="admissionFee")
     city: Optional["CityType"]
     category: Optional[LocationCategoryType]
+    partner: Optional['PartnerType']
 
     @strawberry.field
     def images(self, root) -> List[ImageLocationType]:
@@ -170,6 +207,10 @@ class LocationType:
     @strawberry.field
     def closed_days(self, root) -> List[WeekdayType]:
         return root.closedDays.all()
+
+    @strawberry.field
+    def ar_contents(self, root) -> List[ArHistoricalContentType]:
+        return root.ar_contents.filter(is_active=True)
 
 
 @strawberry_django.type(ImageHiking)
@@ -432,6 +473,8 @@ class PublicTransportNodeType:
     created_at: auto
     updated_at: auto
     city: Optional[CityType]
+    from_city: Optional[CityType] = strawberry_django.field(field_name="fromCity")
+    to_city: Optional[CityType] = strawberry_django.field(field_name="toCity")
     bus_number: auto = strawberry_django.field(field_name="busNumber")
 
     @strawberry.field
@@ -500,7 +543,7 @@ class PublicTransportNodeType:
 
 
 @strawberry.type
-class Query:
+class Query(EventQuery):
     @strawberry.field
     def pages(self, is_active: Optional[bool] = None) -> List[PageType]:
         qs = Page.objects.all()
@@ -759,7 +802,7 @@ class RegisterDevicePayload:
 
 
 @strawberry.type
-class Mutation:
+class Mutation(EventMutation):
     @strawberry.mutation
     def sync_user_preference(
         self,
@@ -864,8 +907,81 @@ class Mutation:
                 ok=False, message=f"Error registering device: {str(e)}"
             )
 
+    @strawberry.mutation
+    def record_ad_click(self, ad_id: strawberry.ID) -> bool:
+        try:
+            from guard.models import Ad, AdClick
+            ad = Ad.objects.get(pk=ad_id)
+            AdClick.objects.create(ad=ad)
+            return True
+        except Exception:
+            return False
+
+    @strawberry.mutation
+    def record_event_click(self, event_id: strawberry.ID) -> bool:
+        # ... l-code elli 3andek déja ...
+        try:
+            from guard.models import Event, EventClick
+            event = Event.objects.get(pk=event_id)
+            EventClick.objects.create(event=event)
+            return True
+        except Exception:
+            return False
+
+    @strawberry.mutation
+    def create_partner(
+        self, 
+        info: strawberry.Info,
+        name: str, 
+        email: str, 
+        link: str, 
+        image: Optional[Upload] = None,
+        location_ids: Optional[List[strawberry.ID]] = None
+    ) -> PartnerType:
+        try:
+            from guard.models import Partner, Location
+            from shared.utils import send_validation_email # ✅ Import de la fonction d'envoi
+
+            # 1. Création du partenaire (is_verified est False par défaut)
+            partner = Partner.objects.create(
+                name=name,
+                email=email,
+                link=link,
+                image=image
+            )
+
+            # 2. Liaison Many-to-Many avec les locations
+            if location_ids:
+                # On récupère les objets Location correspondants aux IDs
+                locations = Location.objects.filter(id__in=location_ids)
+                # On utilise .set() pour remplir la table de liaison Many-to-Many
+                partner.locations.set(locations)
+
+            # 3. ✅ Envoi de l'email de validation sécurisé
+            try:
+                send_validation_email(partner)
+            except Exception as email_error:
+                # On logue l'erreur mais on ne bloque pas la création du partenaire
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f"Email sending failed: {email_error}")
+
+            return partner
+            
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error creating partner: {e}")
+            raise Exception(f"Erreur: {str(e)}")
+
+# --- HNA EL SOLUTION: Lezem el variables héthom ykounou L-BARRA mel class Mutation ---
 
 extensions = []
+
 if not settings.DEBUG:
-    extensions.append(AddValidationRules([NoSchemaIntrospectionCustomRule]))
+    from graphql.validation import NoSchemaIntrospectionCustomRule
+    # On ajoute la règle de sécurité pour la production
+    extensions.append(strawberry.extensions.AddValidationRules([NoSchemaIntrospectionCustomRule]))
+
+# Enfin, on définit le schema
 schema = strawberry.Schema(query=Query, mutation=Mutation, extensions=extensions)

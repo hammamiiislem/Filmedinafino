@@ -89,10 +89,12 @@ class NotificationService:
                 data={
                     'type': 'new_event',
                     'screen': 'event_detail',
+                    'id': str(event.id),
                     'event_id': str(event.id),
                     'location_id': str(event.location.id) if event.location else '',
                     'city_id': str(event.city.id) if event.city else '',
                     'click_action': 'OPEN_EVENT',
+                    'link': f"/events/{event.id}",
                 },
                 tokens=tokens,
                 apns=messaging.APNSConfig(
@@ -101,6 +103,7 @@ class NotificationService:
                             sound='default',
                             badge=1,
                             mutable_content=True,
+                            content_available=True,
                             alert=messaging.ApsAlert(
                                 title='🎉 New Event Coming Up!',
                                 body=f'{event.name} - {start_date_str}',
@@ -113,6 +116,7 @@ class NotificationService:
                         sound='default',
                         channel_id='events',
                         priority='high',
+                        click_action='OPEN_EVENT',
                     )
                 ),
             )
@@ -159,10 +163,12 @@ class NotificationService:
                 data={
                     'type': 'new_location',
                     'screen': 'location_detail',
+                    'id': str(location.id),
                     'location_id': str(location.id),
                     'category_id': str(location.category.id) if location.category else '',
                     'city_id': str(location.city.id) if location.city else '',
                     'click_action': 'OPEN_LOCATION',
+                    'link': f"/locations/{location.id}",
                 },
                 tokens=tokens,
                 apns=messaging.APNSConfig(
@@ -171,6 +177,7 @@ class NotificationService:
                             sound='default',
                             badge=1,
                             mutable_content=True,
+                            content_available=True,
                             alert=messaging.ApsAlert(
                                 title='📍 New Place to Explore!',
                                 body=f'Check out: {location.name}',
@@ -183,6 +190,7 @@ class NotificationService:
                         sound='default',
                         channel_id='locations',
                         priority='high',
+                        click_action='OPEN_LOCATION',
                     )
                 ),
             )
@@ -229,9 +237,11 @@ class NotificationService:
                 data={
                     'type': 'new_hiking',
                     'screen': 'hiking_detail',
+                    'id': str(hiking.id),
                     'hiking_id': str(hiking.id),
                     'city_id': str(hiking.city.id) if hiking.city else '',
                     'click_action': 'OPEN_HIKING',
+                    'link': f"/hikings/{hiking.id}",
                 },
                 tokens=tokens,
                 apns=messaging.APNSConfig(
@@ -240,6 +250,7 @@ class NotificationService:
                             sound='default',
                             badge=1,
                             mutable_content=True,
+                            content_available=True,
                             alert=messaging.ApsAlert(
                                 title='🥾 New Hiking Trail!',
                                 body=f'Explore: {hiking.name}',
@@ -252,6 +263,7 @@ class NotificationService:
                         sound='default',
                         channel_id='hikings',
                         priority='high',
+                        click_action='OPEN_HIKING',
                     )
                 ),
             )

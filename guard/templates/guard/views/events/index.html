@@ -356,17 +356,14 @@
 
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
                 <div>
-                    <label for="{{ form.location.id_for_label }}"
+                    <label for="{{ form.country.id_for_label }}"
                         class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                        {{ form.location.label }}
-                        {% if form.location.field.required %}<span class="text-red-600">*</span>{% endif %}
+                        {{ form.country.label }}
+                        {% if form.country.field.required %}<span class="text-red-600">*</span>{% endif %}
                     </label>
-                    {{ form.location }}
-                    {% if form.location.errors %}
-                    <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ form.location.errors.0 }}</p>
-                    {% endif %}
-                    {% if form.location.help_text %}
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ form.location.help_text }}</p>
+                    {{ form.country }}
+                    {% if form.country.errors %}
+                    <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ form.country.errors.0 }}</p>
                     {% endif %}
                 </div>
                 <div>
@@ -381,6 +378,20 @@
                     {% endif %}
                     {% if form.city.help_text %}
                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ form.city.help_text }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label for="{{ form.location.id_for_label }}"
+                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        {{ form.location.label }}
+                        {% if form.location.field.required %}<span class="text-red-600">*</span>{% endif %}
+                    </label>
+                    {{ form.location }}
+                    {% if form.location.errors %}
+                    <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ form.location.errors.0 }}</p>
+                    {% endif %}
+                    {% if form.location.help_text %}
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ form.location.help_text }}</p>
                     {% endif %}
                 </div>
                 <div>
@@ -619,6 +630,74 @@
         // Update total forms count
         totalForms.value = formCount + 1;
     });
+
+    const countrySelect = document.getElementById('{{ form.country.id_for_label }}');
+    const citySelect = document.getElementById('{{ form.city.id_for_label }}');
+    const locationSelect = document.getElementById('{{ form.location.id_for_label }}');
+
+    if (countrySelect && citySelect) {
+        countrySelect.addEventListener('change', async function() {
+            const countryId = this.value;
+            
+            // Clear current city and location options
+            citySelect.innerHTML = '<option value="">---------</option>';
+            locationSelect.innerHTML = '<option value="">---------</option>';
+            
+            if (countryId) {
+                try {
+                    const response = await fetch(`/api/cities/${countryId}/`);
+                    const data = await response.json();
+                    
+                    if (data.success && data.cities) {
+                        data.cities.forEach(city => {
+                            const option = document.createElement('option');
+                            option.value = city.id;
+                            option.textContent = city.name;
+                            citySelect.appendChild(option);
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error fetching cities:', error);
+                }
+            }
+        });
+    }
+
+    if (citySelect && locationSelect) {
+        citySelect.addEventListener('change', async function() {
+            const cityId = this.value;
+            
+            // Clear current location options
+            locationSelect.innerHTML = '<option value="">---------</option>';
+            
+            if (cityId) {
+                try {
+                    const response = await fetch(`/api/locations/${cityId}/`);
+                    const data = await response.json();
+                    
+                    if (data.success && data.locations) {
+                        // Get current language from document (default to 'fr')
+                        const isFrench = document.documentElement.lang === 'fr' || window.location.pathname.includes('/fr/');
+                        
+                        data.locations.forEach(loc => {
+                            const option = document.createElement('option');
+                            option.value = loc.id;
+                            // Prefer current language name, fallback to English then French
+                            option.textContent = isFrench ? (loc.name_fr || loc.name_en) : (loc.name_en || loc.name_fr);
+                            locationSelect.appendChild(option);
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error fetching locations:', error);
+                }
+            }
+        });
+
+        // Trigger change on load if city is already selected
+        if (citySelect.value) {
+            citySelect.dispatchEvent(new Event('change'));
+        }
+    }
 
     {% include 'shared/js/translation_utils.html' %}
 

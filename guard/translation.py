@@ -7,7 +7,13 @@ from .models import (
     Tip,
     Hiking,
     PublicTransportType,
+    PublicTransport,
 )
+
+
+@register(PublicTransportType)
+class PublicTransportTypeTranslationOptions(TranslationOptions):
+    fields = ('name',)
 
 
 @register(Location)
@@ -49,6 +55,6 @@ class HikingTranslationOptions(TranslationOptions):
     )
 
 
-@register(PublicTransportType)
-class PublicTransportTypeTranslationOptions(TranslationOptions):
-    fields = ("name",)
+#@register(PublicTransportType)
+#class PublicTransportTypeTranslationOptions(TranslationOptions):
+    #fields = ("name",)

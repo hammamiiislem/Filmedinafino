@@ -1,0 +1,543 @@
+{% extends 'guard/base/index.html' %}
+{% load static i18n %}
+
+{% block title %}
+    {% if object %}{% trans "Modifier la pub" %}{% else %}{% trans "Ajouter une pub" %}{% endif %}
+{% endblock title %}
+
+{% block body %}
+
+<div class="max-w-3xl mx-auto px-4 py-6">
+
+    <div class="mb-8 text-center">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+            {% if object %}{% trans "Modifier la campagne" %}{% else %}{% trans "Créer une nouvelle pub" %}{% endif %}
+        </h1>
+        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            {% trans "Remplissez les informations, choisissez les dates et procédez au paiement pour activer votre pub." %}
+        </p>
+    </div>
+
+    {% if object and object.is_paid %}
+    <div class="flex items-center p-4 mb-6 text-sm text-green-800 rounded-xl bg-green-50 dark:bg-green-900/20 dark:text-green-300 border border-green-200 dark:border-green-800">
+        <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+        </svg>
+        <span><strong>{% trans "Pub verrouillée" %}</strong> — {% trans "Cette pub a été payée et ne peut plus être modifiée." %}</span>
+    </div>
+    {% endif %}
+
+    {% if form.errors %}
+    <div class="flex items-center p-4 mb-6 text-sm text-red-800 rounded-xl bg-red-50 dark:bg-gray-800 dark:text-red-400 border border-red-200">
+        <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+        </svg>
+        {% trans "Veuillez corriger les erreurs ci-dessous." %}
+    </div>
+    {% endif %}
+
+    <form action="" method="post" enctype="multipart/form-data" id="adForm" novalidate>
+        {% csrf_token %}
+
+        <input type="hidden" name="startDate" id="id_startDate" value="{{ form.startDate.value|default:'' }}">
+        <input type="hidden" name="endDate" id="id_endDate" value="{{ form.endDate.value|default:'' }}">
+
+        <div class="space-y-6">
+
+            {# ── Section 1 ────────────────────────────────────────────── #}
+            <div class="bg-white dark:bg-gray-800 shadow-sm ring-1 ring-gray-900/5 rounded-xl p-6">
+                <h2 class="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2 mb-5 pb-4 border-b border-gray-100 dark:border-gray-700">
+                    <span class="flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 text-xs font-bold">1</span>
+                    {% trans "Informations de la pub" %}
+                </h2>
+                <div class="space-y-4">
+                    <div>
+                        <label for="{{ form.name.id_for_label }}" class="block mb-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">{{ form.name.label }}</label>
+                        {{ form.name }}
+                        <p class="mt-1 text-xs text-gray-400">{{ form.name.help_text }}</p>
+                        {% if form.name.errors %}<p class="mt-1 text-xs text-red-500">{{ form.name.errors.0 }}</p>{% endif %}
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="{{ form.country.id_for_label }}" class="block mb-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">{{ form.country.label }} <span class="text-red-500">*</span></label>
+                            {{ form.country }}
+                            {% if form.country.errors %}<p class="mt-1 text-xs text-red-500">{{ form.country.errors.0 }}</p>{% endif %}
+                        </div>
+                        <div>
+                            <label for="{{ form.city.id_for_label }}" class="block mb-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">{{ form.city.label }}</label>
+                            {{ form.city }}
+                        </div>
+                    </div>
+                    <div>
+                        <label for="{{ form.link.id_for_label }}" class="block mb-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">{{ form.link.label }} <span class="text-red-500">*</span></label>
+                        {{ form.link }}
+                        {% if form.link.errors %}<p class="mt-1 text-xs text-red-500">{{ form.link.errors.0 }}</p>{% endif %}
+                    </div>
+                    <div class="flex items-center gap-2 pt-1">
+                        {{ form.is_active }}
+                        <label for="{{ form.is_active.id_for_label }}" class="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">{% trans "Pub active" %}</label>
+                    </div>
+                </div>
+            </div>
+
+            {# ── Section 2 ────────────────────────────────────────────── #}
+            <div class="bg-white dark:bg-gray-800 shadow-sm ring-1 ring-gray-900/5 rounded-xl p-6">
+                <h2 class="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2 mb-5 pb-4 border-b border-gray-100 dark:border-gray-700">
+                    <span class="flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 text-xs font-bold">2</span>
+                    {% trans "Visuels" %}
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="{{ form.image_mobile.id_for_label }}" class="block mb-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">{{ form.image_mobile.label }} <span class="text-red-500">*</span></label>
+                        {{ form.image_mobile }}
+                        <p class="mt-1 text-xs text-gray-400">{% trans "Taille requise : 320×50 px" %}</p>
+                        {% if form.image_mobile.errors %}<p class="mt-1 text-xs text-red-500">{{ form.image_mobile.errors.0 }}</p>{% endif %}
+                        {% if object.image_mobile %}<img src="{{ object.image_mobile.url }}" class="mt-2 rounded border border-gray-200" style="max-height:50px;">{% endif %}
+                    </div>
+                    <div>
+                        <label for="{{ form.image_tablet.id_for_label }}" class="block mb-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">{{ form.image_tablet.label }} <span class="text-red-500">*</span></label>
+                        {{ form.image_tablet }}
+                        <p class="mt-1 text-xs text-gray-400">{% trans "Taille requise : 728×90 px" %}</p>
+                        {% if form.image_tablet.errors %}<p class="mt-1 text-xs text-red-500">{{ form.image_tablet.errors.0 }}</p>{% endif %}
+                        {% if object.image_tablet %}<img src="{{ object.image_tablet.url }}" class="mt-2 rounded border border-gray-200" style="max-height:50px;max-width:100%">{% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {# ── Section 3 : Dates avec input + popup calendrier ──────── #}
+            <div class="bg-white dark:bg-gray-800 shadow-sm ring-1 ring-gray-900/5 rounded-xl p-6">
+                <h2 class="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2 mb-5 pb-4 border-b border-gray-100 dark:border-gray-700">
+                    <span class="flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 text-xs font-bold">3</span>
+                    {% trans "Période de diffusion" %}
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <div>
+                        <label class="block mb-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {% trans "Start Date" %} <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <input type="text" id="startDateInput" readonly
+                                placeholder="jj-mm-aaaa"
+                                class="w-full cursor-pointer rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-sm p-2.5 pr-10 focus:outline-none focus:border-blue-500">
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <p class="mt-1 text-xs text-gray-400">{% trans "Minimum : demain" %}</p>
+                        {% if form.startDate.errors %}<p class="mt-1 text-xs text-red-500">{{ form.startDate.errors.0 }}</p>{% endif %}
+                    </div>
+
+                    <div>
+                        <label class="block mb-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {% trans "End Date" %} <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <input type="text" id="endDateInput" readonly
+                                placeholder="jj-mm-aaaa"
+                                class="w-full cursor-pointer rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-sm p-2.5 pr-10 focus:outline-none focus:border-blue-500">
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        {% if form.endDate.errors %}<p class="mt-1 text-xs text-red-500">{{ form.endDate.errors.0 }}</p>{% endif %}
+                    </div>
+
+                </div>
+
+                {# Résumé prix #}
+                <div id="payment-summary" class="hidden mt-5 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+                    <div class="flex justify-between text-sm text-blue-700 dark:text-blue-300 mb-1">
+                        <span>{% trans "Tarif" %}</span>
+                        <span class="font-semibold">15 TND / {% trans "jour" %}</span>
+                    </div>
+                    <div class="flex justify-between text-sm text-blue-700 dark:text-blue-300 mb-3">
+                        <span>{% trans "Durée" %}</span>
+                        <span id="duration-display" class="font-semibold">—</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-3 border-t border-blue-200 dark:border-blue-700">
+                        <span class="font-semibold text-blue-900 dark:text-blue-200">{% trans "Total" %}</span>
+                        <span id="price-display" class="text-2xl font-extrabold text-green-600 dark:text-green-400">0 TND</span>
+                    </div>
+                </div>
+            </div>
+
+            {# ── Boutons ──────────────────────────────────────────────── #}
+            <div class="flex flex-col sm:flex-row gap-3">
+                <a href="{% url 'guard:adsList' %}" class="flex-1 inline-flex justify-center items-center px-5 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600">
+                    {% trans "Annuler" %}
+                </a>
+                <button type="submit" id="submitBtn" class="flex-1 inline-flex justify-center items-center gap-2 px-5 py-3 text-sm font-semibold text-blue-600 bg-transparent border-2 border-blue-600 rounded-xl hover:bg-blue-600 hover:text-white focus:ring-4 focus:ring-blue-300 transition-all disabled:opacity-50">
+                    <svg id="btnIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    <span id="btnText">{% if object %}{% trans "Mettre à jour" %}{% else %}{% trans "Enregistrer" %}{% endif %}</span>
+                </button>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+{# ── Modal facturation ────────────────────────────────────────────────── #}
+<div id="billingModal" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="modalBackdrop"></div>
+    <div class="relative z-10 min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg">
+            <div class="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">{% trans "Informations de facturation" %}</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{% trans "Requis pour générer votre facture" %}</p>
+                </div>
+                <button id="closeModal" class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="mx-6 mt-5 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
+                    <span>{% trans "Campagne" %}</span>
+                    <span id="modalAdName" class="font-medium text-gray-900 dark:text-white">—</span>
+                </div>
+                <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
+                    <span>{% trans "Durée" %}</span>
+                    <span id="modalDuration" class="font-medium text-gray-900 dark:text-white">—</span>
+                </div>
+                <div class="flex justify-between text-sm font-semibold text-gray-900 dark:text-white pt-2 border-t border-gray-200 dark:border-gray-600 mt-2">
+                    <span>{% trans "Total à payer" %}</span>
+                    <span id="modalTotal" class="text-green-600 dark:text-green-400 text-base">—</span>
+                </div>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block mb-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">{% trans "Nom" %} <span class="text-red-500">*</span></label>
+                        <input type="text" id="billing_nom" placeholder="Ben Ali" class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400">
+                    </div>
+                    <div>
+                        <label class="block mb-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">{% trans "Prénom" %} <span class="text-red-500">*</span></label>
+                        <input type="text" id="billing_prenom" placeholder="Ahmed" class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400">
+                    </div>
+                </div>
+                <div>
+                    <label class="block mb-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">{% trans "Email" %} <span class="text-red-500">*</span></label>
+                    <input type="email" id="billing_email" placeholder="ahmed@exemple.com" class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400">
+                </div>
+                <div>
+                    <label class="block mb-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">{% trans "Téléphone" %} <span class="text-red-500">*</span></label>
+                    <div class="flex">
+                        <span class="inline-flex items-center px-3 text-sm text-gray-600 bg-gray-100 border border-r-0 border-gray-300 rounded-l-lg dark:bg-gray-600 dark:text-gray-400 dark:border-gray-600">+216</span>
+                        <input type="tel" id="billing_tel" placeholder="XX XXX XXX" class="block w-full rounded-r-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400">
+                    </div>
+                </div>
+                <div>
+                    <label class="block mb-1.5 text-sm font-medium text-gray-700 dark:text-gray-300">{% trans "Adresse de facturation" %} <span class="text-red-500">*</span></label>
+                    <input type="text" id="billing_adresse" placeholder="12 Rue de la République, Sousse" class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400">
+                </div>
+                <p id="billingError" class="hidden text-sm text-red-600 dark:text-red-400">
+                    {% trans "Veuillez remplir tous les champs obligatoires." %}
+                </p>
+                <button id="confirmPayBtn" class="w-full inline-flex justify-center items-center gap-2 px-5 py-3.5 text-sm font-bold text-green-600 bg-transparent border-2 border-green-600 rounded-xl hover:bg-green-600 hover:text-white focus:ring-4 focus:ring-green-300 transition-all mt-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                    </svg>
+                    <span id="confirmBtnText">{% trans "Confirmer et payer via Konnect" %}</span>
+                </button>
+                <p class="text-xs text-center text-gray-400 dark:text-gray-500">{% trans "Paiement sécurisé via Konnect Tunisia" %}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock body %}
+
+
+{% block extrascript %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<style>
+/* Style du popup calendrier Flatpickr */
+.flatpickr-calendar {
+    font-family: inherit !important;
+    border-radius: 12px !important;
+    border: 0.5px solid #374151 !important;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3) !important;
+    background: #1e293b !important;
+}
+.flatpickr-months, .flatpickr-weekdays, span.flatpickr-weekday {
+    background: #1e293b !important;
+    color: #94a3b8 !important;
+}
+.flatpickr-day { color: #e2e8f0 !important; border-radius: 8px !important; }
+.flatpickr-day:hover { background: #334155 !important; }
+.flatpickr-day.flatpickr-disabled { color: #475569 !important; }
+.flatpickr-day.today { border-color: #3b82f6 !important; }
+.flatpickr-day.selected {
+    background: #2563eb !important;
+    border-color: #2563eb !important;
+    color: #fff !important;
+}
+.flatpickr-current-month select,
+.flatpickr-current-month input.cur-year {
+    color: #e2e8f0 !important;
+    background: transparent !important;
+}
+.flatpickr-prev-month svg, .flatpickr-next-month svg { fill: #94a3b8 !important; }
+.flatpickr-prev-month:hover svg, .flatpickr-next-month:hover svg { fill: #e2e8f0 !important; }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const DAILY_RATE = 15;
+
+    const startHidden  = document.getElementById('id_startDate');
+    const endHidden    = document.getElementById('id_endDate');
+    const summary      = document.getElementById('payment-summary');
+    const durationEl   = document.getElementById('duration-display');
+    const priceEl      = document.getElementById('price-display');
+    const submitBtn    = document.getElementById('submitBtn');
+    const btnIcon      = document.getElementById('btnIcon');
+    const btnText      = document.getElementById('btnText');
+    const adForm       = document.getElementById('adForm');
+
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+
+    let selectedStart = null;
+    let selectedEnd   = null;
+    let savedAdId     = {% if object %}{{ object.pk }}{% else %}null{% endif %};
+    let savedTotal    = 0;
+    let savedDays     = 0;
+
+    const toISO = d => d.toISOString().split('T')[0];
+
+    function calculatePayment() {
+        if (!selectedStart || !selectedEnd || selectedEnd <= selectedStart) {
+            summary?.classList.add('hidden');
+            resetBtn();
+            return;
+        }
+        savedDays  = Math.ceil((selectedEnd - selectedStart) / 86400000);
+        savedTotal = savedDays * DAILY_RATE;
+
+        if (durationEl) durationEl.textContent = `${savedDays} jour${savedDays > 1 ? 's' : ''}`;
+        if (priceEl)    priceEl.textContent     = `${savedTotal} TND`;
+        summary?.classList.remove('hidden');
+
+        btnIcon.innerHTML   = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>`;
+        btnText.textContent = `Payer ${savedTotal} TND & Lancer`;
+        submitBtn.classList.remove('text-blue-600', 'border-blue-600', 'hover:bg-blue-600', 'hover:text-white');
+        submitBtn.classList.add('text-green-600', 'border-green-600', 'hover:bg-green-600', 'hover:text-white');
+    }
+
+    function resetBtn() {
+        btnIcon.innerHTML   = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>`;
+        btnText.textContent = `{% if object %}Mettre à jour{% else %}Enregistrer{% endif %}`;
+        submitBtn.classList.remove('text-green-600', 'border-green-600', 'hover:bg-green-600');
+        submitBtn.classList.add('text-blue-600', 'border-blue-600', 'hover:bg-blue-600', 'hover:text-white');
+    }
+
+    // ── Calendrier popup — Date de DÉBUT ─────────────────────────────
+    const fpStart = flatpickr("#startDateInput", {
+        locale:      "fr",
+        dateFormat:  "d-m-Y",
+        altInput:    false,
+        allowInput:  false,
+        disableMobile: true,
+        minDate:     tomorrow,
+        {% if object and object.startDate %}
+        defaultDate: "{{ object.startDate|date:'Y-m-d' }}",
+        {% endif %}
+        onChange: function(dates) {
+            if (!dates.length) return;
+            selectedStart = dates[0];
+            if (startHidden) startHidden.value = toISO(selectedStart);
+
+            const minEnd = new Date(selectedStart);
+            minEnd.setDate(minEnd.getDate() + 1);
+            fpEnd.set('minDate', minEnd);
+
+            if (selectedEnd && selectedEnd <= selectedStart) {
+                selectedEnd = null;
+                if (endHidden) endHidden.value = '';
+                fpEnd.clear();
+            }
+            calculatePayment();
+        }
+    });
+
+    // ── Calendrier popup — Date de FIN ───────────────────────────────
+    const minEnd0 = new Date(tomorrow);
+    minEnd0.setDate(minEnd0.getDate() + 1);
+
+    const fpEnd = flatpickr("#endDateInput", {
+        locale:      "fr",
+        dateFormat:  "d-m-Y",
+        altInput:    false,
+        allowInput:  false,
+        disableMobile: true,
+        minDate:     minEnd0,
+        {% if object and object.endDate %}
+        defaultDate: "{{ object.endDate|date:'Y-m-d' }}",
+        {% endif %}
+        onChange: function(dates) {
+            if (!dates.length) return;
+            selectedEnd = dates[0];
+            if (endHidden) endHidden.value = toISO(selectedEnd);
+            calculatePayment();
+        }
+    });
+
+    // ── Pré-remplissage mode édition ──────────────────────────────────
+    {% if object and object.startDate and object.endDate %}
+    (function() {
+        selectedStart = new Date("{{ object.startDate|date:'Y-m-d' }}");
+        selectedEnd   = new Date("{{ object.endDate|date:'Y-m-d' }}");
+        calculatePayment();
+    })();
+    {% endif %}
+
+    // ── Soumission ────────────────────────────────────────────────────
+    if (adForm) {
+        adForm.addEventListener('submit', async function (e) {
+            if (!startHidden?.value || !endHidden?.value) return;
+
+            e.preventDefault();
+            submitBtn.disabled  = true;
+            btnText.textContent = 'Enregistrement…';
+
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            let saveData;
+            try {
+                const resp = await fetch(adForm.action || window.location.href, {
+                    method: 'POST', body: new FormData(adForm),
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                });
+                saveData = await resp.json();
+            } catch {
+                alert('Erreur réseau. Veuillez réessayer.');
+                submitBtn.disabled = false; return;
+            }
+
+            if (!saveData.ok) {
+                const firstError = Object.values(saveData.errors || {})[0];
+                alert(firstError?.[0]?.message || 'Erreur de validation.');
+                submitBtn.disabled = false; return;
+            }
+
+            savedAdId = saveData.ad_id;
+            const nameVal = document.getElementById('id_name')?.value || `ADS-${savedAdId}`;
+            document.getElementById('modalAdName').textContent   = nameVal;
+            document.getElementById('modalDuration').textContent = `${savedDays} jour${savedDays > 1 ? 's' : ''}`;
+            document.getElementById('modalTotal').textContent    = `${savedTotal} TND`;
+            submitBtn.disabled = false;
+            openModal();
+        });
+    }
+
+    // ── Modal ─────────────────────────────────────────────────────────
+    const modal          = document.getElementById('billingModal');
+    const modalBackdrop  = document.getElementById('modalBackdrop');
+    const closeModalBtn  = document.getElementById('closeModal');
+    const confirmPayBtn  = document.getElementById('confirmPayBtn');
+    const confirmBtnText = document.getElementById('confirmBtnText');
+    const billingError   = document.getElementById('billingError');
+
+    function openModal()  { modal.classList.remove('hidden'); document.body.classList.add('overflow-hidden'); }
+    function closeModal() { modal.classList.add('hidden'); document.body.classList.remove('overflow-hidden'); billingError.classList.add('hidden'); }
+
+    closeModalBtn?.addEventListener('click', closeModal);
+    modalBackdrop?.addEventListener('click', closeModal);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+    confirmPayBtn?.addEventListener('click', async function () {
+        const nom     = document.getElementById('billing_nom').value.trim();
+        const prenom  = document.getElementById('billing_prenom').value.trim();
+        const email   = document.getElementById('billing_email').value.trim();
+        const tel     = document.getElementById('billing_tel').value.trim();
+        const adresse = document.getElementById('billing_adresse').value.trim();
+
+        if (!nom || !prenom || !email || !tel || !adresse) {
+            billingError.classList.remove('hidden'); return;
+        }
+        billingError.classList.add('hidden');
+        confirmPayBtn.disabled     = true;
+        confirmBtnText.textContent = 'Redirection vers Konnect…';
+
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        let checkoutData;
+        try {
+            const resp = await fetch(`/guard/ads/${savedAdId}/create-checkout/`, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': csrfToken, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nom, prenom, email, tel, adresse }),
+            });
+            checkoutData = await resp.json();
+        } catch {
+            alert('Impossible de contacter le service de paiement.');
+            confirmPayBtn.disabled     = false;
+            confirmBtnText.textContent = 'Confirmer et payer via Konnect';
+            return;
+        }
+
+        if (checkoutData.url) {
+            window.location.href = checkoutData.url;
+        } else {
+            alert(checkoutData.error || 'Impossible de démarrer le paiement.');
+            confirmPayBtn.disabled     = false;
+            confirmBtnText.textContent = 'Confirmer et payer via Konnect';
+        }
+    });
+
+    // ── Filtrage villes ───────────────────────────────────────────────
+    const countrySelect = document.getElementById('id_country');
+    const citySelect    = document.getElementById('id_city');
+
+    function fetchCities(countryId) {
+        if (!countryId) { citySelect.innerHTML = '<option value="">---------</option>'; return; }
+        const current = citySelect.getAttribute('data-initial-value') || citySelect.value;
+        fetch(`/guard/api/cities/${countryId}/`)
+            .then(r => r.json())
+            .then(data => {
+                citySelect.innerHTML = '<option value="">---------</option>';
+                (data.cities || []).forEach(c => {
+                    const opt = new Option(c.name, c.id);
+                    if (c.id == current) opt.selected = true;
+                    citySelect.add(opt);
+                });
+            });
+    }
+
+    if (countrySelect && citySelect) {
+        countrySelect.addEventListener('change', () => fetchCities(countrySelect.value));
+        if (countrySelect.value) fetchCities(countrySelect.value);
+    }
+
+    // ── Validation dimensions images ──────────────────────────────────
+    const _URL = window.URL || window.webkitURL;
+    function validateImg(input, w, h) {
+        if (!input.files?.[0]) return;
+        const img = new Image();
+        img.onload = function () {
+            if (this.width !== w || this.height !== h) {
+                alert(`Dimensions incorrectes : ${this.width}×${this.height}px. Requis : ${w}×${h}px.`);
+                input.value = '';
+            }
+        };
+        img.src = _URL.createObjectURL(input.files[0]);
+    }
+    document.getElementById('id_image_mobile')?.addEventListener('change', e => validateImg(e.target, 320, 50));
+    document.getElementById('id_image_tablet')?.addEventListener('change', e => validateImg(e.target, 728, 90));
+});
+</script>
+{% endblock extrascript %}

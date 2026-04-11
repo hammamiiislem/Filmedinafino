@@ -17,6 +17,7 @@ from .models import (
     PublicTransportType,
     Partner,
     Sponsor,
+    ArHistoricalContent,
 )
 from modeltranslation.admin import TranslationAdmin
 
@@ -25,13 +26,17 @@ class ImageInline(admin.TabularInline):
     model = ImageLocation
     extra = 1
 
+class ArHistoricalContentInline(admin.TabularInline):
+    model = ArHistoricalContent
+    extra = 1
+
 
 @admin.register(Location)
 class LocationAdmin(TranslationAdmin):
     list_display = ["name", "country", "city", "category", "created_at"]
     list_filter = ["country", "is_active_ads", "category"]
     search_fields = ["name", "story", "city__name", "country__name", "category__name"]
-    inlines = [ImageInline]
+    inlines = [ImageInline, ArHistoricalContentInline]
 
     fieldsets = (
         (
@@ -158,7 +163,6 @@ class AdAdmin(admin.ModelAdmin):
     list_display = [
         "name",
         "client",
-        "clicks",
         "is_active",
         "created_at",
     ]
@@ -184,7 +188,7 @@ class AdAdmin(admin.ModelAdmin):
                 )
             },
         ),
-        (_("Statistics"), {"fields": ("clicks",)}),
+        # (_("Statistics"), {"fields": ("clicks",)}),
     )
 
 
@@ -268,3 +272,10 @@ class SponsorAdmin(admin.ModelAdmin):
             {"fields": ("name", "image", "link")},
         ),
     )
+
+
+@admin.register(ArHistoricalContent)
+class ArHistoricalContentAdmin(admin.ModelAdmin):
+    list_display = ["name", "location", "is_active", "created_at"]
+    list_filter = ["is_active", "location__city"]
+    search_fields = ["name", "location__name", "description"]

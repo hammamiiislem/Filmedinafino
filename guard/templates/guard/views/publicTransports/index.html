@@ -14,19 +14,19 @@
     <ol class="inline-flex items-center space-x-1 md:space-x-3">
         <li class="inline-flex items-center">
             <a href="{% url 'guard:dashboard' %}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
-                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
                 {% trans "Dashboard" %}
             </a>
         </li>
         <li>
             <div class="flex items-center">
-                <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
                 <a href="{% url 'guard:publicTransportsList' %}" class="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2 dark:text-gray-400 dark:hover:text-white">{% trans "Public Transports" %}</a>
             </div>
         </li>
         <li aria-current="page">
             <div class="flex items-center">
-                <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
                 <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2 dark:text-gray-400">
                     {% if object %}{% trans "Edit" %}{% else %}{% trans "Add" %}{% endif %}
                 </span>
@@ -37,18 +37,10 @@
 
 <div class="mb-6">
     <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-        {% if object %}
-            {% trans "Edit Public Transport" %}
-        {% else %}
-            {% trans "Add Public Transport" %}
-        {% endif %}
+        {% if object %}{% trans "Edit Public Transport" %}{% else %}{% trans "Add Public Transport" %}{% endif %}
     </h1>
     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-        {% if object %}
-            {% trans "Update the transport route details below" %}
-        {% else %}
-            {% trans "Fill in the details to create a new transport route" %}
-        {% endif %}
+        {% if object %}{% trans "Update the transport route details below" %}{% else %}{% trans "Fill in the details to create a new transport route" %}{% endif %}
     </p>
 </div>
 
@@ -60,8 +52,8 @@
                 <div>{{ error }}</div>
             {% endfor %}
         </div>
-    {% endif %} 
-    
+    {% endif %}
+
     <div class="bg-white dark:bg-gray-800 shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
         <div class="px-4 py-5 sm:p-6">
             <div class="border-b border-gray-200 dark:border-gray-700 pb-4 mb-6">
@@ -86,7 +78,7 @@
                     {% endif %}
                 </div>
                 
-                <div>
+                <div id="city-field-wrapper" style="display:none">
                     <label for="{{ form.city.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                         {{ form.city.label }}
                         {% if form.city.field.required %}<span class="text-red-600">*</span>{% endif %}
@@ -97,7 +89,7 @@
                     {% endif %}
                 </div>
 
-                <div class="sm:col-span-2">
+                <div id="bus-number-wrapper" style="display:none" class="sm:col-span-2">
                     <label for="{{ form.busNumber.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                         {{ form.busNumber.label }}
                         {% if form.busNumber.field.required %}<span class="text-red-600">*</span>{% endif %}
@@ -107,18 +99,72 @@
                         <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ form.busNumber.errors.0 }}</p>
                     {% endif %}
                 </div>
+
+                <div id="return-journey-wrapper" style="display:none" class="sm:col-span-2">
+                    <div class="flex items-start">
+                        <div class="flex items-center h-5">
+                            {{ form.is_return_journey }}
+                        </div>
+                        <div class="ml-3 text-sm">
+                            <label for="{{ form.is_return_journey.id_for_label }}" class="font-medium text-gray-900 dark:text-white">
+                                {{ form.is_return_journey.label }}
+                            </label>
+                            <p class="text-gray-500 dark:text-gray-400">
+                                {{ form.is_return_journey.help_text }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="bg-white dark:bg-gray-800 shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
+    <!-- City to City Section (Train + Metro optional) -->
+    <div id="city-to-city-section" style="display:none" class="bg-white dark:bg-gray-800 shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
+        <div class="px-4 py-5 sm:p-6">
+            <div class="border-b border-gray-200 dark:border-gray-700 pb-4 mb-6">
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                    </svg>
+                    {% trans "Route" %}
+                </h2>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{% trans "Select departure and arrival cities" %}</p>
+            </div>
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div>
+                    <label for="{{ form.fromCity.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        {{ form.fromCity.label }}
+                        {% if form.fromCity.field.required %}<span class="text-red-600">*</span>{% endif %}
+                    </label>
+                    {{ form.fromCity }}
+                    {% if form.fromCity.errors %}
+                        <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ form.fromCity.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label for="{{ form.toCity.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        {{ form.toCity.label }}
+                        {% if form.toCity.field.required %}<span class="text-red-600">*</span>{% endif %}
+                    </label>
+                    {{ form.toCity }}
+                    {% if form.toCity.errors %}
+                        <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ form.toCity.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Region to Region Section (For Metro/Bus) -->
+    <div id="region-to-region-section" style="display:none" class="bg-white dark:bg-gray-800 shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
         <div class="px-4 py-5 sm:p-6">
             <div class="border-b border-gray-200 dark:border-gray-700 pb-4 mb-6">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
                     <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
                     </svg>
-                    {% trans "Route" %}
+                    {% trans "Local Route" %}
                 </h2>
                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{% trans "Select the departure and arrival regions" %}</p>
             </div>
@@ -165,14 +211,25 @@
                 {% for form_item in time_formset %}
                 <div class="time-form-row flex items-center gap-4 p-5 border border-gray-200 dark:border-gray-700 rounded-lg">
                     {{ form_item.id }}
-                    <div class="flex-1">
-                        <label class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">
-                            {% trans "Departure Time" %}
-                        </label>
-                        {{ form_item.time }}
-                        {% if form_item.errors.time %}
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form_item.errors.time }}</p>
-                        {% endif %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
+                        <div>
+                            <label class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">
+                                {% trans "Departure Time" %}
+                            </label>
+                            {{ form_item.time }}
+                            {% if form_item.errors.time %}
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form_item.errors.time }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">
+                                {% trans "Return Time" %}
+                            </label>
+                            {{ form_item.returnTime }}
+                            {% if form_item.errors.returnTime %}
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form_item.errors.returnTime }}</p>
+                            {% endif %}
+                        </div>
                     </div>
                     {% if form_item.instance.pk %}
                     <div class="flex-shrink-0">
@@ -181,10 +238,38 @@
                             <span class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">{% trans "Delete" %}</span>
                         </label>
                     </div>
+                    {% else %}
+                    <button type="button" class="remove-time-btn text-red-600 hover:text-red-800 transition-colors focus:outline-none">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
                     {% endif %}
                 </div>
                 {% endfor %}
             </div>
+
+            <!-- Template for new rows -->
+            <template id="time-template">
+                <div class="time-form-row flex items-center gap-4 p-5 border border-gray-200 dark:border-gray-700 rounded-lg animate-fade-in">
+                    {{ time_formset.empty_form.id }}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
+                        <div>
+                            <label class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">
+                                {% trans "Departure Time" %}
+                            </label>
+                            {{ time_formset.empty_form.time }}
+                        </div>
+                        <div>
+                            <label class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">
+                                {% trans "Return Time" %}
+                            </label>
+                            {{ time_formset.empty_form.returnTime }}
+                        </div>
+                    </div>
+                    <button type="button" class="remove-time-btn text-red-600 hover:text-red-800 transition-colors focus:outline-none">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                </div>
+            </template>
             
             <button type="button" id="add-time-button" class="mt-4 text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
                 <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -201,7 +286,7 @@
         </a>
         <div class="flex gap-x-3">
             <button type="submit" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                 </svg>
                 {% if object %}{% trans "Update Transport" %}{% else %}{% trans "Save Transport" %}{% endif %}
@@ -213,78 +298,229 @@
 {% endblock body %}
 
 {% block extrascript %}
+<style>
+    .time-form-row {
+        transition: all 0.2s ease-in-out;
+    }
+    .animate-fade-in {
+        animation: fadeIn 0.4s ease-out;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
 <script>
-    const citySelect = document.getElementById('{{ form.city.id_for_label }}');
-    const fromRegionSelect = document.getElementById('{{ form.fromRegion.id_for_label }}');
-    const toRegionSelect = document.getElementById('{{ form.toRegion.id_for_label }}');
+
+const transportType = document.getElementById('{{ form.publicTransportType.id_for_label }}');
+const citySelect = document.getElementById('{{ form.city.id_for_label }}');
+const cityWrapper = document.getElementById('city-field-wrapper');
+const busNumberWrapper = document.getElementById('bus-number-wrapper');
+const cityToCitySection = document.getElementById('city-to-city-section');
+const regionToRegionSection = document.getElementById('region-to-region-section');
+const returnJourneyWrapper = document.getElementById('return-journey-wrapper');
+const fromCitySelect = document.getElementById('{{ form.fromCity.id_for_label }}');
+const toCitySelect = document.getElementById('{{ form.toCity.id_for_label }}');
+const fromRegionSelect = document.getElementById('{{ form.fromRegion.id_for_label }}');
+const toRegionSelect = document.getElementById('{{ form.toRegion.id_for_label }}');
+
+// ─── Helpers ───────────────────────────────────────────────
+function setSection(el, visible) {
+    if (!el) return;
+    el.style.display = visible ? 'block' : 'none';
+}
+
+function setDisabled(section, disabled) {
+    if (!section) return;
+    section.querySelectorAll('select, input').forEach(input => {
+        input.disabled = disabled;
+        input.style.opacity = disabled ? '0.4' : '1';
+        input.style.pointerEvents = disabled ? 'none' : '';
+    });
+}
+
+// ─── Main form update ───────────────────────────────────────
+function updateTransportForm() {
+    const type = transportType?.selectedOptions[0]?.text.toLowerCase() || "";
+
+    // Hide all conditional sections by default
+    setSection(cityWrapper, false);
+    setSection(busNumberWrapper, false);
+    setSection(cityToCitySection, false);
+    setSection(regionToRegionSection, false);
+    setSection(returnJourneyWrapper, false);
+
+    // Re-enable all inputs (clean state)
+    setDisabled(cityToCitySection, false);
+    setDisabled(regionToRegionSection, false);
+
+    if (type.includes('bus')) {
+        setSection(cityWrapper, true);
+        setSection(busNumberWrapper, true);
+        setSection(regionToRegionSection, true);
+        setSection(returnJourneyWrapper, true);
+
+    } else if (type.includes('train')) {
+        setSection(cityToCitySection, true);
+        setSection(returnJourneyWrapper, true);
+
+    } else if (type.includes('metro')) {
+        // Metro: Region-to-Region par défaut, City-to-City optionnel (mais pas busNumber)
+        setSection(regionToRegionSection, true);   // Visible par défaut
+        setSection(cityToCitySection, true);       // Aussi visible pour choix optionnel
+        setSection(returnJourneyWrapper, true);
+        // Apply mutual exclusion based on current values
+        applyMetroMutualExclusion();
+    }
+}
+
+// ─── Metro: exclusion mutuelle stricte ──────────────────────
+// Dès qu'on choisit Region → City se bloque, et vice versa.
+function applyMetroMutualExclusion() {
+    const cityFilled = !!(fromCitySelect?.value || toCitySelect?.value);
+    const regionFilled = !!(fromRegionSelect?.value || toRegionSelect?.value);
+
+    if (regionFilled) {
+        // Region sélectionnée → bloquer City-to-City
+        setDisabled(cityToCitySection, true);
+        setDisabled(regionToRegionSection, false);
+    } else if (cityFilled) {
+        // City sélectionnée → bloquer Region-to-Region
+        setDisabled(regionToRegionSection, true);
+        setDisabled(cityToCitySection, false);
+    } else {
+        // Rien → les deux actifs (Region reste le choix par défaut visuellement)
+        setDisabled(cityToCitySection, false);
+        setDisabled(regionToRegionSection, false);
+    }
+}
+
+// ─── Subregions AJAX (for Metro: load based on fromCity) ────
+async function updateSubregions(cityId) {
+    if (!cityId || !fromRegionSelect || !toRegionSelect) return;
+    try {
+        const response = await fetch(`/api/subregions/${cityId}/`);
+        const data = await response.json();
+        if (data.success) {
+            const populateSelect = (select, items) => {
+                const currentValue = select.value;
+                select.innerHTML = '<option value="">---------</option>';
+                items.forEach(item => {
+                    const option = new Option(item.name, item.id);
+                    select.add(option);
+                });
+                select.value = currentValue;
+            };
+            populateSelect(fromRegionSelect, data.subregions);
+            populateSelect(toRegionSelect, data.subregions);
+        }
+    } catch (error) {
+        console.error('Error fetching subregions:', error);
+    }
+}
+
+// ─── Event Listeners ────────────────────────────────────────
+
+// Transport type change → rebuild form
+transportType?.addEventListener('change', updateTransportForm);
+
+// Bus: city changes → reload subregions
+citySelect?.addEventListener('change', () => {
+    updateTransportForm();
+    updateSubregions(citySelect.value);
+});
+
+// Metro: City-to-City fields change
+fromCitySelect?.addEventListener('change', () => {
+    const type = transportType?.selectedOptions[0]?.text.toLowerCase() || "";
+    if (type.includes('metro')) {
+        applyMetroMutualExclusion();
+        if (fromCitySelect.value) updateSubregions(fromCitySelect.value);
+    }
+});
+toCitySelect?.addEventListener('change', () => {
+    const type = transportType?.selectedOptions[0]?.text.toLowerCase() || "";
+    if (type.includes('metro')) applyMetroMutualExclusion();
+});
+
+// Metro: Region-to-Region fields change
+fromRegionSelect?.addEventListener('change', () => {
+    const type = transportType?.selectedOptions[0]?.text.toLowerCase() || "";
+    if (type.includes('metro')) applyMetroMutualExclusion();
+});
+toRegionSelect?.addEventListener('change', () => {
+    const type = transportType?.selectedOptions[0]?.text.toLowerCase() || "";
+    if (type.includes('metro')) applyMetroMutualExclusion();
+});
+
+// ─── Initial run on page load ────────────────────────────────
+updateTransportForm();
+if (citySelect?.value) {
+    updateSubregions(citySelect.value);
+} else if (fromCitySelect?.value) {
+    updateSubregions(fromCitySelect.value);
+}
+
+// ─── Time Formset Management ───────────────────────────────
+const addTimeButton = document.getElementById('add-time-button');
+const timeFormsetContainer = document.getElementById('time-formset');
+
+// More robust way to find the management form input
+const totalFormsInput = document.querySelector('input[id$="-TOTAL_FORMS"]');
+
+const bindRemoveEvent = (btn) => {
+    btn.addEventListener('click', function() {
+        const row = this.closest('.time-form-row');
+        if (row) {
+            row.remove();
+            updateIndices();
+        }
+    });
+};
+
+// Bind existing remove buttons
+document.querySelectorAll('.remove-time-btn')?.forEach(btn => bindRemoveEvent(btn));
+
+if (addTimeButton && totalFormsInput) {
+    addTimeButton.addEventListener('click', () => {
+        const currentCount = parseInt(totalFormsInput.value);
+        const template = document.getElementById('time-template');
+        if (!template) return;
+
+        const newFormHtml = template.innerHTML.replace(/__prefix__/g, currentCount);
+        
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = newFormHtml;
+        const newRow = tempDiv.firstElementChild;
+        
+        timeFormsetContainer.appendChild(newRow);
+        totalFormsInput.value = currentCount + 1;
+        
+        const removeBtn = newRow.querySelector('.remove-time-btn');
+        if (removeBtn) bindRemoveEvent(removeBtn);
+    });
+}
+
+function updateIndices() {
+    if (!totalFormsInput || !timeFormsetContainer) return;
     
-    if (citySelect && fromRegionSelect && toRegionSelect) {
-        citySelect.addEventListener('change', async function() {
-            const cityId = this.value;
-            
-            // Clear current region options
-            fromRegionSelect.innerHTML = '<option value="">---------</option>';
-            toRegionSelect.innerHTML = '<option value="">---------</option>';
-            
-            if (cityId) {
-                try {
-                    const response = await fetch(`/api/subregions/${cityId}/`);
-                    const data = await response.json();
-                    
-                    if (data.success && data.subregions) {
-                        // Populate region dropdowns
-                        data.subregions.forEach(region => {
-                            const option1 = document.createElement('option');
-                            option1.value = region.id;
-                            option1.textContent = region.name;
-                            fromRegionSelect.appendChild(option1);
-                            
-                            const option2 = document.createElement('option');
-                            option2.value = region.id;
-                            option2.textContent = region.name;
-                            toRegionSelect.appendChild(option2);
-                        });
-                    }
-                } catch (error) {
-                    console.error('Error fetching subregions:', error);
-                }
+    const rows = timeFormsetContainer.querySelectorAll('.time-form-row');
+    const prefix = totalFormsInput.name.replace('-TOTAL_FORMS', '');
+    totalFormsInput.value = rows.length;
+    
+    rows.forEach((row, index) => {
+        const regex = new RegExp(`${prefix}-(\\d+|__prefix__)-`, 'g');
+        const replacement = `${prefix}-${index}-`;
+        
+        row.querySelectorAll('input, select, label').forEach(el => {
+            if (el.name) el.name = el.name.replace(regex, replacement);
+            if (el.id) el.id = el.id.replace(regex, replacement);
+            if (el.getAttribute('for')) {
+                el.setAttribute('for', el.getAttribute('for').replace(regex, replacement));
             }
         });
-    }
-
-    // Handle dynamic time formset
-    document.getElementById('add-time-button')?.addEventListener('click', function() {
-        const formset = document.getElementById('time-formset');
-        const totalForms = document.querySelector('#id_publicTransportTimes-TOTAL_FORMS');
-        const formCount = parseInt(totalForms.value);
-        const maxForms = parseInt(document.querySelector('#id_publicTransportTimes-MAX_NUM_FORMS').value);
-        
-        if (formCount >= maxForms) {
-            alert('Maximum number of times reached (20)');
-            return;
-        }
-        
-        // Clone the first empty form
-        const emptyForm = formset.querySelector('.time-form-row');
-        const newForm = emptyForm.cloneNode(true);
-        
-        // Update form index
-        const formRegex = RegExp(`publicTransportTimes-(\\d+)-`, 'g');
-        newForm.innerHTML = newForm.innerHTML.replace(formRegex, `publicTransportTimes-${formCount}-`);
-        
-        // Clear the time input
-        const timeInput = newForm.querySelector('input[type="time"]');
-        if (timeInput) timeInput.value = '';
-        
-        // Remove delete checkbox if present (new forms don't need it)
-        const deleteSection = newForm.querySelector('.flex-shrink-0');
-        if (deleteSection) deleteSection.remove();
-        
-        // Append to formset
-        formset.appendChild(newForm);
-        
-        // Update total forms count
-        totalForms.value = formCount + 1;
     });
+}
+
 </script>
 {% endblock extrascript %}

@@ -27,6 +27,9 @@ INSTALLED_APPS = [
     "api",
     "guard",
     "shared",
+    "advertisements",
+    "events",
+    "partners",
 ]
 
 MIDDLEWARE = [
@@ -134,12 +137,21 @@ LOGOUT_REDIRECT_URL = "shared:login"
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
 ADMIN_LIST_EMAILS = env.list("ADMIN_LIST_EMAILS")
 
+# Email Configuration (Unified)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = env("EMAIL_HOST")
+EMAIL_PORT = env.int("EMAIL_PORT", default=587)
+EMAIL_HOST_USER = env("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
+EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)
+
 
 if DEBUG:
     SITE_URL = "http://localhost:8000"
     CORS_ALLOW_ALL_ORIGINS = DEBUG
     ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
-    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
@@ -159,13 +171,6 @@ else:
         "https://www.fielmedina.com",
     ]
     ALLOWED_HOSTS = ["mystory.fielmedina.com"]
-    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-    EMAIL_HOST = env("EMAIL_HOST")
-    EMAIL_PORT = env.int("EMAIL_PORT")
-    EMAIL_HOST_USER = env("EMAIL_HOST_USER")
-    EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
-    EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS")
-    EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL")
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",

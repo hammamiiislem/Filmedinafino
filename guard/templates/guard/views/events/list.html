@@ -6,113 +6,123 @@
 {% block body %}
    <div class="inline-flex rounded-base -space-x-px" role="group">
       <a href="{% url 'guard:eventsList' %}" class="inline-flex items-center text-heading bg-neutral-primary border border-dark-strong hover:bg-dark hover:text-white focus:ring-3 focus:ring-neutral-tertiary-soft font-medium leading-5 rounded-s-base text-sm px-3 py-2 focus:outline-none">
-         <svg class="w-4 h-4 me-1.5" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Z"/></svg>
-         {% trans "List" %} 
+         <svg class="w-4 h-4 me-1.5" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M468-240q-96-5-162-74t-66-166q0-100 70-170t170-70q97 0 166 66t74 162l-84-25q-13-54-56-88.5T480-640q-66 0-113 47t-47 113q0 57 34.5 100t88.5 56l25 84Zm48 158q-9 2-18 2h-18q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480v18q0 9-2 18l-78-24v-12q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93h12l24 78Zm305 22L650-231 600-80 480-480l400 120-151 50 171 171-79 79Z"/></svg>
+         {% trans "List" %}
       </a>
-      <a href="{% url 'guard:event_create' %}" class="inline-flex items-center text-heading bg-neutral-primary border border-dark-strong hover:bg-dark hover:text-white focus:ring-3 focus:ring-neutral-tertiary-soft font-medium leading-5 rounded-e-base text-sm px-3 py-2 focus:outline-none">
+      <a href="{% url 'events:payment_initiate' %}" class="inline-flex items-center text-heading bg-neutral-primary border border-dark-strong hover:bg-dark hover:text-white focus:ring-3 focus:ring-neutral-tertiary-soft font-medium leading-5 rounded-e-base text-sm px-3 py-2 focus:outline-none">
          <svg class="w-4 h-4 me-1.5" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/></svg>
          {% trans "Add" %}
       </a>
    </div>
 
-   <div class="container py-6">
-      
-      <table id="event-list">
-         <thead>
-            <tr>
-                  <th>
-                     <span class="flex items-center">
-                        {% trans "Event" %}
-                        <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
-                        </svg>
-                     </span>
-                  </th>
-                  <th>
-                     <span class="flex items-center">
-                        {% trans "Location" %}
-                        <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
-                        </svg>
-                     </span>
-                  </th>
-                  <th>
-                     <span class="flex items-center">
-                        {% trans "Start Date" %}
-                        <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
-                        </svg>
-                     </span>
-                  </th>
-                  <th>
-                     <span class="flex items-center">
-                        {% trans "End Date" %}
-                        <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
-                        </svg>
-                     </span>
-                  </th>
-                  <th>
-                     <span class="flex items-center">
-                        {% trans "Price" %}
-                        <svg class="w-4 h-4 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
-                        </svg>
-                     </span>
-                  </th>
-                  <th></th>
-            </tr>
-         </thead>
-         <tbody>
-            {% for data in events %}
-               <tr>
-                     <td class="font-medium text-heading whitespace-nowrap">{{ data.name }}</td>
-                     <td>{% if data.location %}{{ data.location.name }}{% else %}-{% endif %}</td>
-                     <td>{{ data.startDate|date:"Y-m-d" }}</td>
-                     <td>{{ data.endDate|date:"Y-m-d" }}</td>
-                     <td>${{ data.price }}</td>
-                     <td>
-                        <div class="flex items-center gap-2">
-                           <a href="{% url 'guard:event_update' data.id %}" class="inline-flex items-center text-white bg-brand box-border border border-transparent hover:bg-brand-strong focus:ring-4 focus:ring-brand-medium shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none">
-                              <svg class="w-3.5 h-3.5 me-1.5 -ms-0.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"  viewBox="0 0 640 640">
-                                 <path d="M505 122.9L517.1 135C526.5 144.4 526.5 159.6 517.1 168.9L488 198.1L441.9 152L471 122.9C480.4 113.5 495.6 113.5 504.9 122.9zM273.8 320.2L408 185.9L454.1 232L319.8 366.2C316.9 369.1 313.3 371.2 309.4 372.3L250.9 389L267.6 330.5C268.7 326.6 270.8 323 273.7 320.1zM437.1 89L239.8 286.2C231.1 294.9 224.8 305.6 221.5 317.3L192.9 417.3C190.5 425.7 192.8 434.7 199 440.9C205.2 447.1 214.2 449.4 222.6 447L322.6 418.4C334.4 415 345.1 408.7 353.7 400.1L551 202.9C579.1 174.8 579.1 129.2 551 101.1L538.9 89C510.8 60.9 465.2 60.9 437.1 89zM152 128C103.4 128 64 167.4 64 216L64 488C64 536.6 103.4 576 152 576L424 576C472.6 576 512 536.6 512 488L512 376C512 362.7 501.3 352 488 352C474.7 352 464 362.7 464 376L464 488C464 510.1 446.1 528 424 528L152 528C129.9 528 112 510.1 112 488L112 216C112 193.9 129.9 176 152 176L264 176C277.3 176 288 165.3 288 152C288 138.7 277.3 128 264 128L152 128z"/>
-                              </svg>
-                              {% trans "Edit" %}
-                           </a>
-                           {% if data.short_id %}
-                           <a href="{% url 'guard:event_track' data.id %}" class="inline-flex items-center text-white bg-indigo-600 box-border border border-transparent hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-300 shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none dark:bg-indigo-500 dark:hover:bg-indigo-600 dark:focus:ring-indigo-800">
-                               <svg class="w-3.5 h-3.5 me-1.5 -ms-0.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                   <path fill-rule="evenodd" d="M4 4a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H4Zm3 12a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1v-2Zm5-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-6Zm5-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V9Z" clip-rule="evenodd"/>
-                               </svg>
-                               {% trans "Analytics" %}
-                           </a>
-                           {% endif %}
-                           <button data-modal-target="confirm-modal{{ data.id }}" data-modal-toggle="confirm-modal{{ data.id }}" class="inline-flex items-center text-white bg-danger box-border border border-transparent hover:bg-danger-strong focus:ring-4 focus:ring-danger-medium shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none">
-                              <svg class="w-3.5 h-3.5 me-1.5 -ms-0.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 640 640">
-                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M232.7 69.9L224 96L128 96C110.3 96 96 110.3 96 128C96 145.7 110.3 160 128 160L512 160C529.7 160 544 145.7 544 128C544 110.3 529.7 96 512 96L416 96L407.3 69.9C402.9 56.8 390.7 48 376.9 48L263.1 48C249.3 48 237.1 56.8 232.7 69.9zM512 208L128 208L149.1 531.1C150.7 556.4 171.7 576 197 576L443 576C468.3 576 489.3 556.4 490.9 531.1L512 208z"/>
-                              </svg>
-                              {% trans "Delete" %}
-                           </button>
-                        </div>
-                     </td>
-               </tr>
-               {% include "guard/views/events/partials/confirm_model.html" with data=data %}
-            {% endfor %}
-         </tbody>
-      </table>
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">{% trans "Mes Événements" %}</h1>
+        <p class="text-sm text-gray-500">{% trans "Gérez vos événements publiés" %}</p>
+    </div>
 
-   </div>
+    <!-- ACCOUNT STATUS ALERT -->
+    {% if not subscription_alerts.is_active %}
+    <div class="flex items-center p-4 mb-6 text-red-800 rounded-2xl bg-red-50 border border-red-100" role="alert">
+        <svg class="flex-shrink-0 w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+        <div class="ms-3 text-sm font-medium">
+            {% trans "Compte suspendu — renouveler pour publier" %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="flex flex-col items-center justify-center p-12 bg-white border border-gray-100 rounded-3xl shadow-sm min-h-[400px]">
+        {% if events %}
+            <div class="w-full">
+               <table id="events-table" class="w-full text-sm text-left rtl:text-right text-gray-500">
+                  <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                     <tr>
+                        <th class="px-6 py-3">{% trans "Name" %}</th>
+                        <th class="px-6 py-3">{% trans "Clicks" %}</th>
+                        <th class="px-6 py-3">{% trans "Category" %}</th>
+                        <th class="px-6 py-3">{% trans "Status" %}</th>
+                        <th class="px-6 py-3 text-right">{% trans "Actions" %}</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     {% for event in events %}
+                     <tr class="bg-white border-b hover:bg-gray-50">
+                        <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                           <a href="{% url 'events:update' event.id %}" class="hover:underline">
+                              {{ event.title }}
+                           </a>
+                        </td>
+                        <td class="px-6 py-4">
+                           <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                              {{ event.clicks|default:0 }}
+                           </span>
+                        </td>
+                        <td class="px-6 py-4">
+                           {{ event.location.category.name|default:"—" }}
+                        </td>
+                        <td class="px-6 py-4">
+                           {% if event.status == 'APPROVED' %}
+                           <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                              {% trans "Active" %}
+                           </span>
+                           {% elif event.status == 'PENDING' %}
+                           <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                              {% trans "Pending" %}
+                           </span>
+                           {% else %}
+                           <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                              {% trans "Rejected" %}
+                           </span>
+                           {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                           <div class="flex justify-end gap-2">
+                              <a href="{% url 'events:update' event.id %}" class="text-blue-600 hover:text-blue-900 font-medium">{% trans "Edit" %}</a>
+                              <button data-modal-target="confirm-modal{{ event.id }}" data-modal-toggle="confirm-modal{{ event.id }}" class="text-red-600 hover:text-red-900 font-medium">{% trans "Delete" %}</button>
+                           </div>
+                        </td>
+                     </tr>
+                     {% include "guard/views/events/partials/confirm_model.html" with data=event %}
+                     {% endfor %}
+                  </tbody>
+               </table>
+            </div>
+        {% else %}
+            <!-- EMPTY STATE (MATCHING IMAGE 3) -->
+            <div class="flex flex-col items-center">
+                <div class="w-32 h-32 bg-blue-50 rounded-3xl flex items-center justify-center mb-6">
+                    <svg class="w-16 h-16 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">{% trans "Aucun événement" %}</h3>
+                <p class="text-gray-500 mb-8 text-center max-w-sm">
+                    {% trans "Créez votre premier événement pour le faire apparaître ici." %}
+                </p>
+                <a href="{% url 'events:payment_initiate' %}" class="inline-flex items-center px-6 py-3 text-white bg-blue-600 hover:bg-blue-700 font-bold rounded-2xl transition-all shadow-lg shadow-blue-200">
+                    <svg class="w-5 h-5 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    {% trans "Ajouter un événement" %}
+                </a>
+            </div>
+        {% endif %}
+    </div>
+  </div>
 {% endblock body %}
 
 {% block extrascript %}
-   <script src="https://cdn.jsdelivr.net/npm/simple-datatables@9.0.3"></script>
-   <script>
+<script src="https://cdn.jsdelivr.net/npm/simple-datatables@9.0.3"></script>
+<script>
+function trackClick(type, id) {
+    const url = type === 'ad'
+        ? `/guard/api/record/ad/${id}/`
+        : `/guard/api/record/event/${id}/`;
+    fetch(url).catch(err => console.error('Tracking error:', err));
+}
 
-   if (document.getElementById("event-list") && typeof simpleDatatables.DataTable !== 'undefined') {
-      const dataTable = new simpleDatatables.DataTable("#event-list", {
-         searchable: true,
-         perPageSelect: false
-      });
-   }
-   </script>
+if (document.getElementById("events-table") && typeof simpleDatatables.DataTable !== 'undefined') {
+    new simpleDatatables.DataTable("#events-table", {
+        searchable: true,
+        perPageSelect: false
+    });
+}
+</script>
 {% endblock extrascript %}

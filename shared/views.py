@@ -1,4 +1,6 @@
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
+from django.core.mail import send_mail
+from django.utils.crypto import get_random_string
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.mixins import UserPassesTestMixin
@@ -60,10 +62,39 @@ class RegisterView(CreateView):
     success_url = reverse_lazy("shared:login")
 
     def form_valid(self, form):
-        form.save()
-        messages.success(
-            self.request, _("Account created successfully. Please log in.")
-        )
+        # 1. Generate random password
+        password = get_random_string(length=10)
+        
+        # 2. Save user and set password
+        user = form.save(commit=False)
+        user.set_password(password)
+        user.save()
+        
+        # 3. Ensure profile is marked (Signal does creation, let's update if needed)
+        profile = user.profile
+        profile.is_first_login = True
+        profile.save()
+
+        # 4. Send email
+        subject = _("Your New Account at FielMedina")
+        message = _(
+            "Hello {username},\n\n"
+            "Your account has been created successfully.\n"
+            "Your temporary password is: {password}\n\n"
+            "Please login and change your password as soon as possible.\n\n"
+            "Regards,\nFielMedina Team"
+        ).format(username=user.username, password=password)
+        
+        try:
+            send_mail(subject, message, None, [user.email])
+            messages.success(
+                self.request, _("Account created successfully. The password has been sent to your email.")
+            )
+        except Exception as e:
+            messages.warning(
+                self.request, _("Account created, but we couldn't send the password email. Please contact support.")
+            )
+            
         return super().form_valid(form)
 
 
@@ -246,3 +277,12 @@ def translate_text(request):
 
     except Exception as e:
         return JsonResponse({"success": False, "error": str(e)}, status=500)
+# =============================================================================
+# Ajoute cette vue dans views.py
+# =============================================================================
+
+class AdminPartnersDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+    template_name = "guard/views/partners/partials/adminpartnersdashboard.html"
+
+    def test_func(self):
+        return self.request.user.is_staff

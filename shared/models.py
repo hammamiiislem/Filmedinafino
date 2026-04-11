@@ -152,6 +152,8 @@ class UserProfile(models.Model):
     )
     subscription_started_at = models.DateField(null=True, blank=True)
     subscription_renews_at = models.DateField(null=True, blank=True)
+    is_first_login = models.BooleanField(default=True)
+    is_active_account = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -257,3 +259,37 @@ class Package(models.Model):
 
     def get_absolute_url(self):
         return reverse("package_detail", kwargs={"pk": self.pk})
+
+
+class Transaction(models.Model):
+    class Status(models.TextChoices):
+        PENDING = "pending", _("Pending")
+        COMPLETED = "completed", _("Completed")
+        FAILED = "failed", _("Failed")
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="transactions")
+    amount = models.DecimalField(max_digits=10, decimal_places=3)
+    payment_method = models.CharField(max_length=50)  # flouci, konnect
+    gateway_ref = models.CharField(max_length=255, blank=True, null=True)
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+    
+    # Details for invoice
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    phone = models.CharField(max_length=20)
+    email = models.EmailField()
+    billing_address = models.TextField()
+
+    # Generic relation to what is being paid for (Sub, Event, Ad)
+    from django.contrib.contenttypes.fields import GenericForeignKey
+    from django.contrib.contenttypes.models import ContentType
+    
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey("content_type", "object_id")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("Transaction")
+        verbose_name_plural = _("Transactions")
