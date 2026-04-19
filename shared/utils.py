@@ -99,24 +99,32 @@ def resize_to_fixed(image_field, size=(300, 200)):
 
 
 def send_validation_email(partner):
+    from django.core.mail import EmailMultiAlternatives
+    from django.template.loader import render_to_string
+ 
     token = signing.dumps({'partner_id': partner.id})
-    verify_url = f"http://127.0.0.1:8000/verify-email/?token={token}"
-    
-    # Sujet yfahmék chkoun el partenaire jdid
-    subject = f"Nouveau Partenaire à valider : {partner.name}"
-    
-    # El message ywalli adressé lik enti
-    message = f"Bonjour Admin,\n\nLe partenaire {partner.name} s'est inscrit.\n"
-    message += f"Lien de validation : {verify_url}"
-    
+    verify_url = f"{settings.SITE_URL}/verify-email/?token={token}"
+ 
+    context = {
+    'company_name': partner.name,
+    'verification_url': verify_url,
+}
+ 
+    subject = f"Validez votre compte FielMedina — {partner.name}"
+    text_content = render_to_string('emails/verification.txt', context)
+    html_content = render_to_string('emails/verification.html', context)
+ 
+    email = EmailMultiAlternatives(
+        subject,
+        text_content,
+        settings.DEFAULT_FROM_EMAIL,
+        [partner.email],
+    )
+    email.attach_alternative(html_content, "text/html")
+ 
     try:
-        send_mail(
-            subject, 
-            message, 
-            settings.DEFAULT_FROM_EMAIL, 
-            ['islemhamami345@gmail.com'], # <--- HOUNI t7at el mail mte3ek (Destinataire)
-            fail_silently=False,
-        )
-        print(f"DEBUG: Email envoyé à l'admin pour le partenaire {partner.id}")
+        email.send(fail_silently=False)
+        print(f"DEBUG: Email envoyé à {partner.email}")
     except Exception as e:
         print(f"Erreur d'envoi email : {e}")
+ 

@@ -4,254 +4,115 @@
 {% block title %}{% trans "Dashboard" %}{% endblock title %}
 
 {% block body %}
-    {% if not user.is_staff %}
-     <!-- SUBSCRIPTION EXPIRY ALERT (MATCHING IMAGE 2) -->
-     {% if subscription_alerts.is_expiring or subscription_alerts.is_unpaid %}
-     <div class="flex items-center p-5 mb-6 text-yellow-800 rounded-3xl bg-yellow-50 border border-yellow-100 shadow-sm" role="alert">
-         <div class="flex-shrink-0 w-10 h-10 bg-white rounded-xl flex items-center justify-center mr-4 shadow-sm text-lg">⏰</div>
-         <div class="text-sm font-semibold">
-             <span class="text-gray-900 block mb-0.5">{% trans "Abonnement expire bientôt" %}</span>
-             <span class="text-gray-500 font-medium">
-                {% blocktrans with days=subscription_alerts.days_left %}Votre abonnement expire dans <span class="text-red-500">{{ days }}</span> jour(s){% endblocktrans %} 
-                ({{ subscription_alerts.renews_at|date:"M. d, Y" }}).
-             </span>
-         </div>
-     </div>
-     {% endif %}
 
-     <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900">{% trans "Bonjour," %} {{ request.user.username }} 👋</h1>
-        <p class="mt-1 text-sm text-gray-500">{% trans "Voici un aperçu de votre activité" %}</p>
-     </div>
-
-     <!-- PENDING VALIDATION ALERT (MATCHING IMAGE 2) -->
-     {% if not request.user.profile.is_active_account %}
-     <div class="flex items-center p-4 mb-8 text-blue-800 rounded-2xl bg-blue-50 border border-blue-100" role="alert">
-         <div class="flex-shrink-0 mr-3">⏳</div>
-         <div class="text-sm font-medium">
-             {% trans "Votre compte est en attente de validation par l'administrateur FielMedina." %}
-         </div>
-     </div>
-     {% endif %}
-    {% else %}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-       <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-          <div class="flex items-center justify-between mb-4">
-             <div class="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                </svg>
-             </div>
-             <span class="text-2xl font-bold text-gray-900 dark:text-white">{{ admin_stats.subscribers }}</span>
-          </div>
-          <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Total Subscribers" %}</h3>
-          <a href="{% url 'guard:subscribersList' %}" class="mt-4 inline-flex items-center text-xs font-semibold text-purple-600 hover:text-purple-700">
-             {% trans "Manage" %} <svg class="w-3 h-3 ms-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-          </a>
-       </div>
-       <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-          <div class="flex items-center justify-between mb-4">
-             <div class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
-             </div>
-             <span class="text-2xl font-bold text-gray-900 dark:text-white">{{ admin_stats.locations }}</span>
-          </div>
-          <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Total Locations" %}</h3>
-          <a href="{% url 'guard:locationsList' %}" class="mt-4 inline-flex items-center text-xs font-semibold text-blue-600 hover:text-blue-700">
-             {% trans "Manage" %} <svg class="w-3 h-3 ms-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-          </a>
-       </div>
-       <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-          <div class="flex items-center justify-between mb-4">
-             <div class="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                </svg>
-             </div>
-             <span class="text-2xl font-bold text-gray-900 dark:text-white">{{ admin_stats.events }}</span>
-          </div>
-          <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Total Events" %}</h3>
-          <a href="{% url 'guard:eventsList' %}" class="mt-4 inline-flex items-center text-xs font-semibold text-green-600 hover:text-green-700">
-             {% trans "Manage" %} <svg class="w-3 h-3 ms-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-          </a>
-       </div>
-       <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-          <div class="flex items-center justify-between mb-4">
-             <div class="p-3 bg-pink-50 dark:bg-pink-900/20 rounded-lg">
-                <svg class="w-6 h-6 text-pink-600 dark:text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
-             </div>
-             <span class="text-2xl font-bold text-gray-900 dark:text-white">{{ admin_stats.partners }}</span>
-          </div>
-          <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">{% trans "Total Partners" %}</h3>
-          <a href="{% url 'guard:partnersList' %}" class="mt-4 inline-flex items-center text-xs font-semibold text-pink-600 hover:text-pink-700">
-             {% trans "Manage" %} <svg class="w-3 h-3 ms-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-          </a>
-       </div>
-    </div>
-    {% endif %}
-
-    <div class="border-t border-gray-200 dark:border-gray-700 pt-8 mt-10">
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center">
-                <svg class="w-6 h-6 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                </svg>
-                {% trans "Engagement Analytics" %}
-            </h2>
-            <span class="px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-xs font-bold rounded-full uppercase tracking-wider">
-                {% trans "Last 7 Days" %}
-            </span>
+    <!-- 4 STAT CARDS existantes -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+                <div class="p-2 rounded-lg bg-orange-50 dark:bg-orange-900/30">
+                    <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                </div>
+                <span class="text-xs font-semibold text-green-500">+{{ db_stats.locations_this_month }} {% trans "this month" %}</span>
+            </div>
+            <h5 class="text-3xl font-bold text-gray-900 dark:text-white">{{ db_stats.total_locations }}</h5>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{% trans "Locations" %}</p>
         </div>
 
-        <!-- PARTNER CARDS (MATCHING IMAGES) -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            
-            <!-- CONTRAT CARD -->
-            <div class="bg-white border border-gray-100 rounded-2xl shadow-sm p-6 flex flex-col justify-between h-40">
-                <div class="flex justify-between items-start">
-                    <span class="text-gray-500 font-medium text-sm">{% trans "Contrat" %}</span>
-                    <div class="w-8 h-8 rounded-lg {% if subscription_alerts.is_active %}bg-green-100{% else %}bg-gray-100{% endif %} flex items-center justify-center">
-                        {% if subscription_alerts.is_active %}
-                        <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-                        {% else %}
-                        <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-                        {% endif %}
-                    </div>
+        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+                <div class="p-2 rounded-lg bg-green-50 dark:bg-green-900/30">
+                    <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
                 </div>
-                <div>
-                    <h4 class="text-3xl font-bold text-gray-900 mt-2">
-                        {% if subscription_alerts.is_active %}{% trans "Actif" %}{% else %}{% trans "Inactif" %}{% endif %}
-                    </h4>
-                    <p class="text-xs text-gray-400 mt-1">
-                        {% if subscription_alerts.renews_at %}
-                            {% trans "Expire le" %} {{ subscription_alerts.renews_at|date:"d M Y" }}
-                        {% else %}
-                            {% trans "Aucun contrat actif" %}
-                        {% endif %}
-                    </p>
-                </div>
+                <span class="text-xs font-semibold text-blue-500">{{ db_stats.upcoming_events }} {% trans "upcoming" %}</span>
             </div>
+            <h5 class="text-3xl font-bold text-gray-900 dark:text-white">{{ db_stats.total_events }}</h5>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{% trans "Events" %}</p>
+        </div>
 
-            <!-- ÉVÉNEMENTS CARD -->
-            <div class="bg-white border border-gray-100 rounded-2xl shadow-sm p-6 flex flex-col justify-between h-40">
-                <div class="flex justify-between items-start">
-                    <span class="text-gray-500 font-medium text-sm">{% trans "Événements" %}</span>
-                    <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                        <svg class="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 00-1-1H6zm3 2h2v1H9V4zm4 1v1H3V6a1 1 0 011-1h12a1 1 0 011 1z" clip-rule="evenodd"></path></svg>
-                    </div>
+        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+                <div class="p-2 rounded-lg bg-purple-50 dark:bg-purple-900/30">
+                    <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+                    </svg>
                 </div>
-                <div>
-                    <h4 class="text-3xl font-bold text-gray-900 mt-2">{{ card_stats.events_count }}</h4>
-                    <p class="text-xs text-gray-400 mt-1">{% trans "Événements publiés" %}</p>
-                </div>
+                <span class="text-xs font-semibold text-gray-400">{% trans "trails" %}</span>
             </div>
+            <h5 class="text-3xl font-bold text-gray-900 dark:text-white">{{ db_stats.total_hikings }}</h5>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{% trans "Hikings" %}</p>
+        </div>
 
-            <!-- PUBLICITÉS CARD -->
-            <div class="bg-white border border-gray-100 rounded-2xl shadow-sm p-6 flex flex-col justify-between h-40">
-                <div class="flex justify-between items-start">
-                    <span class="text-gray-500 font-medium text-sm">{% trans "Publicités" %}</span>
-                    <div class="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
-                        <svg class="w-5 h-5 text-purple-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
-                    </div>
+        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+                <div class="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/30">
+                    <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.003 9.003 0 1020.945 13H11V3.055z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/>
+                    </svg>
                 </div>
-                <div>
-                    <h4 class="text-3xl font-bold text-gray-900 mt-2">{{ card_stats.ads_count }}</h4>
-                    <p class="text-xs text-gray-400 mt-1">{% trans "Annonces actives" %}</p>
-                </div>
+                <span class="text-xs font-semibold text-green-500">{{ db_stats.active_ads }} {% trans "active" %}</span>
             </div>
-
+            <h5 class="text-3xl font-bold text-gray-900 dark:text-white">{{ db_stats.total_ads }}</h5>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{% trans "Ads" %}</p>
         </div>
     </div>
+
+    <!-- SECTION PARTENAIRES -->
+    <p class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">
+        Espace Partenaires
+    </p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+
+        <!-- Events partenaires en attente -->
+        <a href="{% url 'admin:partners_partnerevent_changelist' %}?status=pending"
+           class="bg-white dark:bg-gray-800 border border-yellow-200 dark:border-yellow-700 rounded-xl p-5 shadow-sm hover:shadow-md transition block">
+            <div class="flex items-center justify-between mb-3">
+                <div class="p-2 rounded-lg bg-yellow-50 dark:bg-yellow-900/30">
+                    <svg class="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+                <span class="text-xs font-semibold text-yellow-500">⏳ À valider</span>
+            </div>
+            <h5 class="text-3xl font-bold text-gray-900 dark:text-white">{{ db_stats.pending_partner_events }}</h5>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Events Partenaires</p>
+        </a>
+
+        <!-- Ads partenaires en attente de paiement -->
+        <a href="{% url 'admin:partners_partnerad_changelist' %}"
+           class="bg-white dark:bg-gray-800 border border-purple-200 dark:border-purple-700 rounded-xl p-5 shadow-sm hover:shadow-md transition block">
+            <div class="flex items-center justify-between mb-3">
+                <div class="p-2 rounded-lg bg-purple-50 dark:bg-purple-900/30">
+                    <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+                <span class="text-xs font-semibold text-purple-500">💳 En attente</span>
+            </div>
+            <h5 class="text-3xl font-bold text-gray-900 dark:text-white">{{ db_stats.pending_partner_ads }}</h5>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Ads Partenaires</p>
+        </a>
+
+        <!-- Nouveaux partenaires à vérifier -->
+        <a href="{% url 'admin:partners_partner_changelist' %}"
+           class="bg-white dark:bg-gray-800 border border-green-200 dark:border-green-700 rounded-xl p-5 shadow-sm hover:shadow-md transition block">
+            <div class="flex items-center justify-between mb-3">
+                <div class="p-2 rounded-lg bg-green-50 dark:bg-green-900/30">
+                    <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                </div>
+                <span class="text-xs font-semibold text-green-500">🆕 Nouveaux</span>
+            </div>
+            <h5 class="text-3xl font-bold text-gray-900 dark:text-white">{{ db_stats.new_partners }}</h5>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Partenaires à vérifier</p>
+        </a>
+
     </div>
-
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-
-    // ── CORRECTION : bonne URL avec préfixe /guard/ ──────────────────────
-    const statsUrl = "{% url 'guard:dashboard_stats_api' %}";
-    let adsChart, eventsChart;
-
-    const commonOptions = {
-        chart: {
-            type: 'area', height: 120,
-            sparkline: { enabled: true },
-            animations: {
-                enabled: true, easing: 'easeinout', speed: 1000,
-                animateGradually: { enabled: true, delay: 150 },
-                dynamicAnimation: { enabled: true, speed: 350 }
-            }
-        },
-        stroke: { curve: 'smooth', width: 4 },
-        fill: { type: 'gradient', gradient: { opacityFrom: 0.45, opacityTo: 0.05, stops: [20, 100] } },
-        markers: { size: 5, strokeWidth: 2, hover: { size: 7 } },
-        tooltip: { theme: 'dark', x: { show: false } }
-    };
-
-    function updateDisplayTotal(elementId, total) {
-        const el = document.getElementById(elementId);
-        if (el) el.textContent = total;
-    }
-
-    async function fetchStats() {
-        try {
-            const response = await fetch(statsUrl);
-            if (!response.ok) throw new Error('Network response was not ok');
-            const data = await response.json();
-
-            updateDisplayTotal('ads-total',    data.ads?.totalClicks    || 0);
-            updateDisplayTotal('events-total', data.events?.totalClicks || 0);
-
-            const adsData    = data.ads?.clickStatistics?.timeline.map(p => p.clicks)    || [0,0,0,0,0,0,0];
-            const eventsData = data.events?.clickStatistics?.timeline.map(p => p.clicks) || [0,0,0,0,0,0,0];
-
-            if (!adsChart) {
-                adsChart = new ApexCharts(document.querySelector("#ads-sparkline"), {
-                    ...commonOptions,
-                    series: [{ name: 'Ads Clicks', data: adsData }],
-                    colors: ['#3b82f6'],
-                    yaxis: { min: 0 }
-                });
-                adsChart.render();
-            } else {
-                adsChart.updateSeries([{ data: adsData }]);
-            }
-
-            if (!eventsChart) {
-                eventsChart = new ApexCharts(document.querySelector("#events-sparkline"), {
-                    ...commonOptions,
-                    series: [{ name: 'Events Clicks', data: eventsData }],
-                    colors: ['#10b981'],
-                    yaxis: { min: 0 }
-                });
-                eventsChart.render();
-            } else {
-                eventsChart.updateSeries([{ data: eventsData }]);
-            }
-
-        } catch (error) {
-            console.error('Error fetching dashboard stats:', error);
-        }
-    }
-
-    // ── CORRECTION : bonne URL avec préfixe /guard/ ──────────────────────
-    window.trackClick = function(type, id) {
-        const url = type === 'ad'
-            ? `/guard/api/record/ad/${id}/`
-            : `/guard/api/record/event/${id}/`;
-        fetch(url)
-            .then(() => fetchStats())   // met à jour les graphiques immédiatement
-            .catch(err => console.error('Tracking error:', err));
-    };
-
-    fetchStats();
-    setInterval(fetchStats, 30000);
-});
-</script>
 
 {% endblock body %}

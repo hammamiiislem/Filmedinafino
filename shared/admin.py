@@ -40,11 +40,11 @@ class UserProfileAdmin(admin.ModelAdmin):
 @admin.register(UserPreference)
 class UserPreferenceAdmin(admin.ModelAdmin):
     list_display = (
-        "user_uid",
+        "user",
         "first_visit",
         "traveling_with",
         "interests",
         "created_at",
     )
     list_filter = ("first_visit", "traveling_with")
-    search_fields = ("user_uid", "traveling_with")
+    search_fields = ("user__email", "traveling_with")

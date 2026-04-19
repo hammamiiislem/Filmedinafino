@@ -1,281 +1,89 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
-from .models import (
-    Location,
-    ImageLocation,
-    ImageEvent,
-    LocationCategory,
-    Event,
-    EventCategory,
-    Tip,
-    Hiking,
-    ImageHiking,
-    Ad,
-    HikingLocation,
-    PublicTransport,
-    PublicTransportTime,
-    PublicTransportType,
-    Partner,
-    Sponsor,
-    ArHistoricalContent,
-)
-from modeltranslation.admin import TranslationAdmin
+from .models import GuardUser
+from django.contrib.auth.models import Group
+from django import forms
 
 
-class ImageInline(admin.TabularInline):
-    model = ImageLocation
-    extra = 1
+class GuardUserCreationForm(forms.ModelForm):
+    password1 = forms.CharField(label=_('Password'), widget=forms.PasswordInput)
+    password2 = forms.CharField(label=_('Password confirmation'), widget=forms.PasswordInput)
 
-class ArHistoricalContentInline(admin.TabularInline):
-    model = ArHistoricalContent
-    extra = 1
+    class Meta:
+        model = GuardUser
+        # email is REQUIRED on the model (unique=True, no null/blank)
+        fields = ('username', 'email', 'is_staff', 'is_active')
+
+    def clean_password2(self):
+        p1 = self.cleaned_data.get("password1")
+        p2 = self.cleaned_data.get("password2")
+        if p1 and p2 and p1 != p2:
+            raise forms.ValidationError(_("Passwords don't match"))
+        return p2
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.set_password(self.cleaned_data["password1"])
+        if commit:
+            user.save()
+            # No manual save_m2m() here; allow ModelAdmin to handle it via the standard flow
+        return user
 
 
-@admin.register(Location)
-class LocationAdmin(TranslationAdmin):
-    list_display = ["name", "country", "city", "category", "created_at"]
-    list_filter = ["country", "is_active_ads", "category"]
-    search_fields = ["name", "story", "city__name", "country__name", "category__name"]
-    inlines = [ImageInline, ArHistoricalContentInline]
+class GuardUserChangeForm(forms.ModelForm):
+    class Meta:
+        model = GuardUser
+        fields = ('username', 'email', 'is_staff', 'is_active', 'is_verified', 'groups', 'user_permissions')
 
+
+# Guard against double-unregister
+if admin.site.is_registered(Group):
+    admin.site.unregister(Group)
+
+@admin.register(Group)
+class GroupAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(GuardUser)
+class GuardUserAdmin(admin.ModelAdmin):
+    add_form    = GuardUserCreationForm
+    form        = GuardUserChangeForm
+
+    list_display  = ['username', 'email', 'is_staff', 'is_active', 'is_verified']
+    list_filter   = ['is_staff', 'is_active', 'is_verified']
+    search_fields = ['username', 'email']
+    ordering      = ['email']
+
+    filter_horizontal = ('groups', 'user_permissions')
+
+    # Fieldsets for the EDIT view
     fieldsets = (
-        (
-            _("Basic Information"),
-            {"fields": ("country", "city", "is_active_ads", "category")},
-        ),
-        (
-            _("Location Details"),
-            {
-                "fields": (
-                    "name",
-                    "latitude",
-                    "longitude",
-                    "openFrom",
-                    "openTo",
-                    "closedDays",
-                    "admissionFee",
-                    "story",
-                )
-            },
-        ),
+        (None, {'fields': ('username', 'email', 'password')}),
+        (_('Permissions'), {'fields': ('is_staff', 'is_active', 'is_verified', 'groups', 'user_permissions')}),
     )
 
-
-@admin.register(LocationCategory)
-class LocationCategoryAdmin(TranslationAdmin):
-    list_display = ["name", "created_at"]
-    search_fields = ["name"]
-
-
-class ImageEventInline(admin.TabularInline):
-    model = ImageEvent
-    extra = 1
-
-
-@admin.register(Event)
-class EventAdmin(TranslationAdmin):
-    list_display = [
-        "name",
-        "location",
-        "client",
-        "startDate",
-        "endDate",
-        "price",
-        "boost",
-        "created_at",
-    ]
-    list_filter = ["startDate", "endDate", "location", "boost"]
-    search_fields = ["name", "description", "location__name", "client__user__username"]
-    inlines = [ImageEventInline]
-
-    fieldsets = (
-        (
-            _("Basic Information"),
-            {"fields": ("name", "client", "location", "category")},
-        ),
-        (
-            _("Event Schedule"),
-            {
-                "fields": (
-                    "startDate",
-                    "endDate",
-                    "time",
-                    "link",
-                    "short_link",
-                    "short_id",
-                )
-            },
-        ),
-        (_("Details"), {"fields": ("price", "description", "boost")}),
+    # Fieldsets for the ADD view
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'email', 'password1', 'password2', 'is_staff', 'is_active'),
+        }),
     )
 
+    def get_form(self, request, obj=None, **kwargs):
+        """Return the creation form when adding, change form when editing."""
+        if obj is None:
+            kwargs['form'] = self.add_form
+        else:
+            kwargs['form'] = self.form
+        return super().get_form(request, obj, **kwargs)
 
-@admin.register(EventCategory)
-class EventCategoryAdmin(TranslationAdmin):
-    list_display = ["name", "created_at"]
-    search_fields = ["name"]
-
-
-@admin.register(Tip)
-class TipAdmin(TranslationAdmin):
-    list_display = ["city", "created_at"]
-    list_filter = ["city"]
-    search_fields = ["city__name"]
-
-
-class HikingLocationInline(admin.TabularInline):
-    model = HikingLocation
-    extra = 1
+    def get_fieldsets(self, request, obj=None):
+        if obj is None:
+            return self.add_fieldsets
+        return self.fieldsets
 
 
-class ImageHikingInline(admin.TabularInline):
-    model = ImageHiking
-    extra = 1
-
-
-@admin.register(Hiking)
-class HikingAdmin(TranslationAdmin):
-    list_display = [
-        "city",
-        "name",
-    ]
-    list_filter = ["city", "name", "locations"]
-    search_fields = [
-        "name",
-        "description",
-    ]
-    inlines = [HikingLocationInline, ImageHikingInline]
-
-    fieldsets = (
-        (
-            _("Basic Information"),
-            {"fields": ("name", "city", "description")},
-        ),
-        (
-            _("Geolocation"),
-            {"fields": ("latitude", "longitude")},
-        ),
-    )
-
-
-@admin.register(Ad)
-class AdAdmin(admin.ModelAdmin):
-    list_display = [
-        "name",
-        "client",
-        "is_active",
-        "created_at",
-    ]
-    list_filter = ["is_active", "client"]
-    search_fields = ["name", "link", "client__user__username"]
-
-    fieldsets = (
-        (
-            _("Basic Information"),
-            {"fields": ("name", "client", "is_active")},
-        ),
-        (
-            _("Ad Images"),
-            {"fields": ("image_mobile", "image_tablet")},
-        ),
-        (
-            _("Link Information"),
-            {
-                "fields": (
-                    "link",
-                    "short_link",
-                    "short_id",
-                )
-            },
-        ),
-        # (_("Statistics"), {"fields": ("clicks",)}),
-    )
-
-
-@admin.register(PublicTransportType)
-class PublicTransportTypeAdmin(TranslationAdmin):
-    list_display = ["name"]
-    search_fields = ["name"]
-
-
-class PublicTransportTimeInline(admin.TabularInline):
-    model = PublicTransportTime
-    extra = 1
-
-
-@admin.register(PublicTransport)
-class PublicTransportAdmin(admin.ModelAdmin):
-    list_display = [
-        "city",
-        "publicTransportType",
-        "fromRegion",
-        "toRegion",
-    ]
-    list_filter = [
-        "city",
-        "publicTransportType",
-    ]
-    search_fields = [
-        "city__name",
-    ]
-    inlines = [PublicTransportTimeInline]
-
-    fieldsets = (
-        (
-            _("Basic Information"),
-            {"fields": ("publicTransportType", "city", "fromRegion", "toRegion")},
-        ),
-    )
-
-    class Media:
-        js = ("admin/js/public_transport_admin.js",)
-
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name in ["fromRegion", "toRegion"]:
-            # If we are editing an existing object, filter subregions by city
-            obj_id = request.resolver_match.kwargs.get("object_id")
-            if obj_id:
-                try:
-                    obj = self.get_object(request, obj_id)
-                    if obj and obj.city:
-                        from cities_light.models import SubRegion
-
-                        kwargs["queryset"] = SubRegion.objects.filter(
-                            region=obj.city.region
-                        )
-                except Exception:
-                    pass
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
-
-
-@admin.register(Partner)
-class PartnerAdmin(admin.ModelAdmin):
-    list_display = ["name", "image", "link"]
-    search_fields = ["name"]
-
-    fieldsets = (
-        (
-            _("Basic Information"),
-            {"fields": ("name", "image", "link")},
-        ),
-    )
-
-
-@admin.register(Sponsor)
-class SponsorAdmin(admin.ModelAdmin):
-    list_display = ["name", "image", "link"]
-    search_fields = ["name"]
-
-    fieldsets = (
-        (
-            _("Basic Information"),
-            {"fields": ("name", "image", "link")},
-        ),
-    )
-
-
-@admin.register(ArHistoricalContent)
-class ArHistoricalContentAdmin(admin.ModelAdmin):
-    list_display = ["name", "location", "is_active", "created_at"]
-    list_filter = ["is_active", "location__city"]
-    search_fields = ["name", "location__name", "description"]
+GuardUser._meta.verbose_name = _("User")
+GuardUser._meta.verbose_name_plural = _("Users")

@@ -10,6 +10,12 @@ from tinymce.models import HTMLField
 from django.core.files.uploadedfile import UploadedFile
 from shared.models import OptimizedImageModel, UserProfile
 from shared.utils import optimize_image, resize_to_fixed
+import hashlib
+from core.models import UUIDModel, TimeStampedModel
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from .managers import CustomUserManager
+
+from django.contrib.auth import get_user_model
 
 
 # =============================================================================
@@ -178,7 +184,7 @@ class Location(models.Model):
     
     # Raje3na el partner hna bch el GraphQL yal9ah
     partner = models.ForeignKey(
-        'Partner', 
+        'partners.Partner', 
         on_delete=models.SET_NULL, 
         null=True, 
         blank=True, 
@@ -488,7 +494,7 @@ class PublicTransportTime(models.Model):
 # =============================================================================
 # PARTNER & SPONSOR
 # =============================================================================
-class Partner(models.Model):
+class LegacyPartner(models.Model):
     name = models.CharField(max_length=255, verbose_name=_("Name"))
     
     # --- AJOUT: Email indispensable pour envoyer le lien de validation ---
@@ -501,7 +507,7 @@ class Partner(models.Model):
     locations = models.ManyToManyField(
         "Location", 
         blank=True, 
-        related_name="partners", 
+        related_name="legacy_partners", 
         verbose_name=_("Locations")
     )
     
@@ -535,20 +541,11 @@ class Sponsor(models.Model):
         verbose_name        = _("sponsor")
         verbose_name_plural = _("sponsors")
 
-    def save(self, *args, **kwargs):
-        if self.image and isinstance(self.image.file, UploadedFile):
-            processed = resize_to_fixed(self.image, size=(300, 200))
-            if processed:
-                name, content = processed
-                content.name  = name
-                self.image    = content
-        super().save(*args, **kwargs)
-
     def __str__(self):
         return self.name
 
 
-@receiver(post_delete, sender=Partner)
+@receiver(post_delete, sender=LegacyPartner)
 @receiver(post_delete, sender=Sponsor)
 def cleanup_all_files(sender, instance, **kwargs):
     for field in instance._meta.fields:
@@ -590,3 +587,105 @@ class EventClick(models.Model):
     class Meta:
         verbose_name        = _("Event Click Record")
         verbose_name_plural = _("Event Click Records")
+
+
+# =============================================================================
+# SYSTEM LOGS & STATISTICS
+# =============================================================================
+
+class DashboardStatistics(models.Model):
+    total_locations = models.IntegerField(default=0)
+    locations_this_month = models.IntegerField(default=0)
+    total_events = models.IntegerField(default=0)
+    upcoming_events = models.IntegerField(default=0)
+    events_this_month = models.IntegerField(default=0)
+    total_hikings = models.IntegerField(default=0)
+    hikings_this_month = models.IntegerField(default=0)
+    total_ads = models.IntegerField(default=0)
+    active_ads = models.IntegerField(default=0)
+    total_fcm_devices = models.IntegerField(default=0)
+    ios_devices = models.IntegerField(default=0)
+    android_devices = models.IntegerField(default=0)
+    active_users_30d = models.IntegerField(default=0)
+    notifications_sent_24h = models.IntegerField(default=0)
+    notifications_failed_24h = models.IntegerField(default=0)
+    error_count_24h = models.IntegerField(default=0)
+    last_error_message = models.TextField(blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("Dashboard Statistics")
+        verbose_name_plural = _("Dashboard Statistics")
+
+    def __str__(self):
+        return f"Stats {self.updated_at.strftime('%Y-%m-%d %H:%M')}"
+
+
+class ActivityLog(models.Model):
+    timestamp = models.DateTimeField(auto_now_add=True)
+    activity_type = models.CharField(max_length=100)
+    entity_name = models.CharField(max_length=255)
+    entity_type = models.CharField(max_length=100)
+    entity_id = models.CharField(max_length=255)
+    user = models.CharField(max_length=255, blank=True, null=True)
+    success = models.BooleanField(default=True)
+    error_message = models.TextField(blank=True, null=True)
+    details = models.JSONField(default=dict, blank=True)
+
+    class Meta:
+        verbose_name = _("Activity Log")
+        verbose_name_plural = _("Activity Logs")
+
+    def __str__(self):
+        return f"{self.activity_type} - {self.entity_name} ({self.timestamp})"
+
+
+class NotificationLog(models.Model):
+    timestamp = models.DateTimeField(auto_now_add=True)
+    notification_type = models.CharField(max_length=100)
+    status = models.CharField(max_length=50)
+    device_count_attempted = models.IntegerField(default=0)
+    device_count_succeeded = models.IntegerField(default=0)
+    title = models.CharField(max_length=255)
+    body = models.TextField()
+    entity_type = models.CharField(max_length=100, blank=True, null=True)
+    entity_id = models.CharField(max_length=255, blank=True, null=True)
+    response = models.JSONField(default=dict, blank=True)
+
+    class Meta:
+        verbose_name = _("Notification Log")
+        verbose_name_plural = _("Notification Logs")
+
+    def __str__(self):
+        return f"{self.notification_type} - {self.title} ({self.timestamp})"
+
+
+
+class GuardUser(AbstractBaseUser, PermissionsMixin, UUIDModel, TimeStampedModel):
+    # التغيير الأساسي: إضافة unique=True
+    username = models.CharField(max_length=150, unique=True, null=True, blank=True)
+    email = models.EmailField(unique=True)
+    is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    is_verified = models.BooleanField(default=False)
+    
+    objects = CustomUserManager()
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email']
+
+    def __str__(self):
+        # تصليح: نضمنوا إنها ترجع string ديما
+        return self.username if self.username else self.email
+
+
+class EmailVerificationToken(UUIDModel, TimeStampedModel):
+    user = models.ForeignKey('GuardUser', on_delete=models.CASCADE, related_name='verification_tokens')
+    token_hash = models.CharField(max_length=64, unique=True) # SHA-256 fait 64 caractères
+    expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)
+
+    @staticmethod
+    def hash_token(raw_token):
+        return hashlib.sha256(raw_token.encode()).hexdigest()
+

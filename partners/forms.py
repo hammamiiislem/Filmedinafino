@@ -1,227 +1,330 @@
-from django import forms
-from django.core.exceptions import ValidationError
+from django.contrib import admin
 from django.utils import timezone
-from partners.models import Partner, PartnerEvent, PartnerAd
+from django.contrib import messages
+from django.utils.html import format_html
+from django import forms
+from django.core.mail import send_mail
+from django.conf import settings
+from .models import (
+    Partner, PartnerContract, PartnerEvent,
+    PartnerEventMedia, PartnerAd, Coupon, AdminNotification
+)
+
+# ── Actions ───────────────────────────────────────────────────────────────────
+
+def approve_email_change(modeladmin, request, queryset):
+    count = 0
+    for partner in queryset.filter(pending_email__isnull=False):
+        partner.user.email = partner.pending_email
+        partner.user.save(update_fields=['email'])
+        partner.pending_email = None
+        partner.save(update_fields=['pending_email'])
+        count += 1
+    messages.success(request, f"{count} changement(s) d'email approuvé(s).")
+approve_email_change.short_description = "✅ Approuver le changement d'email"
+
+def reject_email_change(modeladmin, request, queryset):
+    count = queryset.filter(pending_email__isnull=False).update(pending_email=None)
+    messages.success(request, f"{count} changement(s) rejeté(s).")
+reject_email_change.short_description = "❌ Rejeter le changement d'email"
+
+def freeze_account(modeladmin, request, queryset):
+    count = queryset.update(account_frozen=True)
+    messages.success(request, f"{count} compte(s) suspendu(s).")
+freeze_account.short_description = "🔒 Suspendre le compte"
+
+def unfreeze_account(modeladmin, request, queryset):
+    count = queryset.update(account_frozen=False)
+    messages.success(request, f"{count} compte(s) réactivé(s).")
+unfreeze_account.short_description = "🔓 Réactiver le compte"
+
+def verify_partner(modeladmin, request, queryset):
+    count = queryset.update(is_verified=True, validated_at=timezone.now())
+    messages.success(request, f"{count} partenaire(s) vérifié(s).")
+verify_partner.short_description = "✅ Vérifier le partenaire"
+
+def send_terms_changed_email(modeladmin, request, queryset):
+    from datetime import date
+    today = date.today()
+    count_email = 0
+    count_frozen = 0
+
+    for partner in queryset:
+        should_freeze = (
+            (partner.is_trial and partner.trial_end and partner.trial_end < today)
+            or
+            (not partner.is_trial and (not partner.contract_end or partner.contract_end < today))
+        )
+
+        try:
+            if should_freeze:
+                send_mail(
+                    subject="📢 Mise à jour conditions + Suspension de votre compte FielMedina",
+                    message=f"""Bonjour {partner.company_name},
+
+Nous vous informons que les conditions générales d'utilisation de FielMedina ont été mises à jour.
+
+Suite à cette mise à jour, votre compte a été suspendu car votre période d'essai
+ou votre abonnement n'est plus actif.
+
+Pour réactiver votre compte, veuillez souscrire à un abonnement :
+{settings.SITE_URL}/partners/subscription/
+
+Cordialement,
+L'équipe FielMedina""",
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[partner.email],
+                    fail_silently=False,
+                )
+                partner.account_frozen = True
+                partner.is_verified    = False
+                partner.save(update_fields=['account_frozen', 'is_verified'])
+                count_frozen += 1
+            else:
+                send_mail(
+                    subject="📢 Mise à jour des conditions générales FielMedina",
+                    message=f"""Bonjour {partner.company_name},
+
+Nous vous informons que les conditions générales d'utilisation de FielMedina ont été mises à jour.
+
+Pour consulter les nouvelles conditions et continuer à utiliser nos services :
+{settings.SITE_URL}/partners/subscription/
+
+Cordialement,
+L'équipe FielMedina""",
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[partner.email],
+                    fail_silently=False,
+                )
+            count_email += 1
+        except Exception as e:
+            messages.error(request, f"Erreur pour {partner.email}: {e}")
+
+    messages.success(
+        request,
+        f"{count_email} email(s) envoyé(s). {count_frozen} compte(s) suspendu(s)."
+    )
+send_terms_changed_email.short_description = "📧 Envoyer email conditions + suspendre non payants"
 
 
-CSS = 'w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
-CSS_SELECT = f'{CSS} bg-white'
+def convert_trial_to_paid(modeladmin, request, queryset):
+    count = 0
+    for partner in queryset.filter(is_trial=True):
+        partner.is_trial       = False
+        partner.is_verified    = True
+        partner.account_frozen = False
+        partner.save(update_fields=['is_trial', 'is_verified', 'account_frozen'])
+        count += 1
+    messages.success(request, f"{count} partenaire(s) converti(s) en payant.")
+convert_trial_to_paid.short_description = "💳 Convertir trial → payant"
 
 
-class PartnerLoginForm(forms.Form):
-    email    = forms.EmailField(widget=forms.EmailInput(attrs={
-        'class':       CSS,
-        'placeholder': 'votre@email.com',
-    }))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={
-        'class':       CSS,
-        'placeholder': '••••••••',
-    }))
+def send_trial_expiry_email(modeladmin, request, queryset):
+    count = 0
+    for partner in queryset:
+        try:
+            send_mail(
+                subject="Votre période d'essai FielMedina a expiré",
+                message=f"""Bonjour {partner.company_name},
 
-    def clean(self):
-        cleaned  = super().clean()
-        email    = cleaned.get('email')
-        password = cleaned.get('password')
+Votre période d'essai gratuite de 6 mois sur FielMedina a expiré le {partner.trial_end.strftime('%d/%m/%Y') if partner.trial_end else '—'}.
 
-        if email and password:
-            try:
-                partner = Partner.objects.get(email=email, is_active=True)
-            except Partner.DoesNotExist:
-                raise ValidationError("Email ou mot de passe incorrect.")
+Pour continuer à bénéficier de nos services :
+{settings.SITE_URL}/partners/subscription/
 
-            if not partner.check_password(password):
-                raise ValidationError("Email ou mot de passe incorrect.")
-
-            if partner.account_frozen:
-                raise ValidationError("Votre compte est suspendu pour non-paiement.")
-
-            cleaned['partner'] = partner
-        return cleaned
-
-
-class PartnerEventForm(forms.ModelForm):
-    class Meta:
-        model  = PartnerEvent
-        fields = [
-            # ── Titre / Description (champs principaux + bilingues) ──────────
-            'title', 'description',
-            'title_en', 'title_fr',
-            'description_en', 'description_fr',
-            # ── Event Details ────────────────────────────────────────────────
-            'category',       # ✅ ForeignKey → guard.EventCategory
-            'city',           # ✅ ForeignKey → cities_light.City
-            'location',       # ✅ ForeignKey → guard.Location
-            'start_date',
-            'end_date',
-            'event_time',     # ✅ nouveau
-            'price',          # ✅ nouveau
-            'link',
-        ]
-        widgets = {
-            # ── Titre principal (hidden, sync via JS) ────────────────────────
-            'title': forms.TextInput(attrs={
-                'class':       CSS,
-                'placeholder': 'Titre de l evenement',
-            }),
-            # ── Description principale (hidden, sync via JS) ─────────────────
-            'description': forms.Textarea(attrs={
-                'class':       f'{CSS} resize-none',
-                'rows':        4,
-                'placeholder': 'Description de l evenement...',
-            }),
-            # ── Champs bilingues (utilisés en hidden dans le template) ───────
-            'title_en': forms.TextInput(attrs={'class': CSS}),
-            'title_fr': forms.TextInput(attrs={'class': CSS}),
-            'description_en': forms.Textarea(attrs={'class': f'{CSS} resize-none', 'rows': 4}),
-            'description_fr': forms.Textarea(attrs={'class': f'{CSS} resize-none', 'rows': 4}),
-
-            # ✅ Category dropdown — affiche les EventCategory de guard app
-            'category': forms.Select(attrs={
-                'class': CSS_SELECT,
-            }),
-
-            # ✅ City dropdown — affiche les villes de cities_light
-            'city': forms.Select(attrs={
-                'class': CSS_SELECT,
-            }),
-
-            # ✅ Location dropdown — affiche les locations de guard app
-            'location': forms.Select(attrs={
-                'class': CSS_SELECT,
-            }),
-
-            # ── Dates ────────────────────────────────────────────────────────
-            'start_date': forms.DateInput(attrs={
-                'class': CSS,
-                'type':  'date',
-            }),
-            'end_date': forms.DateInput(attrs={
-                'class': CSS,
-                'type':  'date',
-            }),
-
-            # ✅ Heure
-            'event_time': forms.TimeInput(attrs={
-                'class': CSS,
-                'type':  'time',
-            }),
-
-            # ✅ Prix
-            'price': forms.NumberInput(attrs={
-                'class':       CSS,
-                'placeholder': 'Enter event price',
-                'step':        '0.001',
-                'min':         '0',
-            }),
-
-            # ── Lien (destination link) ──────────────────────────────────────
-            'link': forms.URLInput(attrs={
-                'class':       CSS,
-                'placeholder': 'https://example.com',
-            }),
-        }
-
-    # ── Validation date début : minimum +7 jours (INCHANGÉ) ──────────────────
-    def clean_start_date(self):
-        start_date = self.cleaned_data.get('start_date')
-        if not start_date:
-            return start_date
-        today = timezone.now().date()
-        delta = (start_date - today).days
-        if delta < 7:
-            raise ValidationError(
-                f"La date de debut doit etre au minimum dans 7 jours (actuellement dans {delta} jour(s))."
+Cordialement,
+L'équipe FielMedina""",
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[partner.email],
+                fail_silently=False,
             )
-        return start_date
-
-    # ── Validation prix ───────────────────────────────────────────────────────
-    def clean_price(self):
-        price = self.cleaned_data.get('price')
-        if price is not None and price < 0:
-            raise ValidationError("Le prix ne peut pas être négatif.")
-        return price
-
-    # ── Validation category obligatoire ──────────────────────────────────────
-    def clean_category(self):
-        category = self.cleaned_data.get('category')
-        if not category:
-            raise ValidationError("La catégorie est obligatoire.")
-        return category
-
-    # ── Validation city obligatoire ───────────────────────────────────────────
-    def clean_city(self):
-        city = self.cleaned_data.get('city')
-        if not city:
-            raise ValidationError("La ville est obligatoire.")
-        return city
-
-    def clean(self):
-        cleaned    = super().clean()
-        start_date = cleaned.get('start_date')
-        end_date   = cleaned.get('end_date')
-        if start_date and end_date and end_date < start_date:
-            raise ValidationError("La date de fin ne peut pas etre avant la date de debut.")
-        return cleaned
+            partner.trial_notified = True
+            partner.is_verified    = False
+            partner.save(update_fields=['trial_notified', 'is_verified'])
+            count += 1
+        except Exception as e:
+            messages.error(request, f"Erreur pour {partner.email}: {e}")
+    messages.success(request, f"{count} email(s) d'expiration envoyé(s).")
+send_trial_expiry_email.short_description = "⏰ Envoyer email expiration trial"
 
 
-class PartnerAdForm(forms.ModelForm):
+# ── Partner Admin Form ────────────────────────────────────────────────────────
+
+class PartnerAdminForm(forms.ModelForm):
     class Meta:
-        model  = PartnerAd
-        fields = ['title', 'mobile_image', 'tablet_image', 'destination_link', 'start_date', 'end_date']
-        widgets = {
-            'title': forms.TextInput(attrs={
-                'class':       CSS,
-                'placeholder': 'e.g., Summer Campaign 2026',
-            }),
-            'destination_link': forms.URLInput(attrs={
-                'class':       CSS,
-                'placeholder': 'https://example.com',
-            }),
-            'start_date': forms.DateInput(attrs={
-                'class': CSS,
-                'type':  'date',
-            }),
-            'end_date': forms.DateInput(attrs={
-                'class': CSS,
-                'type':  'date',
-            }),
-        }
-
-    def clean_mobile_image(self):
-        mobile_image = self.cleaned_data.get('mobile_image')
-        if not mobile_image:
-            raise ValidationError("L'image mobile (320x50) est obligatoire.")
-        return mobile_image
-
-    def clean_tablet_image(self):
-        tablet_image = self.cleaned_data.get('tablet_image')
-        if not tablet_image:
-            raise ValidationError("L'image tablet (728x90) est obligatoire.")
-        return tablet_image
-
-    def clean_destination_link(self):
-        url = self.cleaned_data.get('destination_link')
-        if not url:
-            raise ValidationError("Le lien de destination est obligatoire.")
-        return url
-
-    def clean_start_date(self):
-        start_date = self.cleaned_data.get('start_date')
-        if not start_date:
-            return start_date
-        today = timezone.now().date()
-        if start_date <= today:
-            raise ValidationError("La date de debut doit etre dans le futur.")
-        return start_date
+        model  = Partner
+        fields = '__all__'
 
     def clean(self):
-        cleaned    = super().clean()
-        start_date = cleaned.get('start_date')
-        end_date   = cleaned.get('end_date')
-        if start_date and end_date:
-            if end_date < start_date:
-                raise ValidationError("La date de fin ne peut pas etre avant la date de debut.")
-            nb_days = (end_date - start_date).days + 1
-            if nb_days < 1:
-                raise ValidationError("La publicite doit durer au moins 1 jour.")
-        return cleaned
+        cleaned_data = super().clean()
+        user  = cleaned_data.get('user')
+        email = cleaned_data.get('email', '')
+
+        if email:
+            email = email.strip().lower()
+            cleaned_data['email'] = email
+
+        if not email and user and user.email:
+            email = user.email.strip().lower()
+            cleaned_data['email'] = email
+
+        if email:
+            qs = Partner.objects.filter(email=email)
+            if self.instance.pk:
+                qs = qs.exclude(pk=self.instance.pk)
+            if qs.exists():
+                raise forms.ValidationError(
+                    f"Un partenaire avec l'email '{email}' existe déjà. "
+                    f"Veuillez utiliser un autre email ou un autre utilisateur."
+                )
+
+        return cleaned_data
+
+
+# ── Admin Partner ─────────────────────────────────────────────────────────────
+
+
+class PartnerAdmin(admin.ModelAdmin):
+    form = PartnerAdminForm
+
+    list_display  = [
+        'company_name', 'get_email', 'status_display', 'trial_display',
+        'contract_end', 'days_left_display',
+        'pending_email_display', 'unpaid_alert_display',
+    ]
+    list_filter   = ['is_verified', 'is_active', 'account_frozen',
+                     'is_temporarily_disabled', 'contract_period',
+                     'is_trial', 'trial_notified']
+    search_fields = ['company_name', 'user__email', 'pending_email']
+    readonly_fields = ['created_at', 'validated_at', 'id',
+                       'disabled_at', 'reactivated_at',
+                       'trial_start', 'trial_end', 'trial_notified']
+
+    actions = [
+        verify_partner,
+        approve_email_change, reject_email_change,
+        freeze_account, unfreeze_account,
+        send_terms_changed_email,
+        convert_trial_to_paid,
+        send_trial_expiry_email,
+    ]
+
+    fieldsets = (
+        ('Identité', {
+            'fields': ('id', 'user', 'company_name', 'email', 'phone', 'logo')
+        }),
+        ('Statut', {
+            'fields': ('is_active', 'is_verified', 'account_frozen',
+                       'is_temporarily_disabled', 'disabled_reason',
+                       'disabled_at', 'reactivated_at', 'validated_at')
+        }),
+        ('Contrat', {
+            'fields': ('contract_period', 'payment_type', 'contract_start', 'contract_end')
+        }),
+        ("Période d'essai", {
+            'fields': ('is_trial', 'trial_start', 'trial_end', 'trial_notified'),
+            'classes': ('collapse',),
+        }),
+        ('Email en attente', {
+            'fields': ('pending_email',),
+            'classes': ('collapse',),
+        }),
+        ('Dates', {
+            'fields': ('created_at',),
+            'classes': ('collapse',),
+        }),
+    )
+
+    def get_email(self, obj):
+        return obj.email or (obj.user.email if obj.user else '—')
+    get_email.short_description = "Email"
+
+    def trial_display(self, obj):
+        if not obj.is_trial:
+            return '—'
+        if obj.is_trial_expired:
+            return format_html('<span style="color:red">🔴 Trial expiré</span>')
+        if obj.trial_end:
+            days = (obj.trial_end - timezone.now().date()).days
+            return format_html('<span style="color:green">🟢 Trial — {} j restants</span>', days)
+        return format_html('<span style="color:blue">🔵 Trial</span>')
+    trial_display.short_description = "Trial"
+
+    def status_display(self, obj):
+        if obj.is_temporarily_disabled:
+            return format_html('<span style="color:orange">⏸ Désactivé</span>')
+        if obj.account_frozen:
+            return format_html('<span style="color:red">🔒 Suspendu</span>')
+        if obj.is_verified:
+            return format_html('<span style="color:green">✅ Actif</span>')
+        return format_html('<span style="color:gray">⏳ En attente</span>')
+    status_display.short_description = "Statut"
+
+    def days_left_display(self, obj):
+        days = obj.days_until_expiry
+        if days is None:
+            return "—"
+        if days <= 0:
+            return format_html('<span style="color:red">Expiré</span>')
+        return f"{days} jours"
+    days_left_display.short_description = "Expiration"
+
+    def pending_email_display(self, obj):
+        if obj.pending_email:
+            return format_html('<span style="color:orange">⏳ {}</span>', obj.pending_email)
+        return "—"
+    pending_email_display.short_description = "Email en attente"
+
+    def unpaid_alert_display(self, obj):
+        days = obj.days_until_expiry
+        if days is not None and days <= -10:
+            return format_html('<span style="color:red;font-weight:bold">🚨 Impayé {}j</span>', abs(days))
+        return "—"
+    unpaid_alert_display.short_description = "⚠️ Alerte impayé"
+
+
+# ── Admin Event ────────────────────────────────────────────────────────────────
+
+@admin.register(PartnerEvent)
+class PartnerEventAdmin(admin.ModelAdmin):
+    list_display    = ['title', 'partner', 'status', 'start_date', 'is_published']
+    list_filter     = ['status', 'is_published']
+    search_fields   = ['title', 'partner__company_name']
+    readonly_fields = ['created_at', 'updated_at']
+
+
+# ── Admin Ad ───────────────────────────────────────────────────────────────────
+
+@admin.register(PartnerAd)
+class PartnerAdAdmin(admin.ModelAdmin):
+    list_display    = ['title', 'partner', 'status', 'start_date', 'end_date', 'total_price']
+    list_filter     = ['status']
+    search_fields   = ['title', 'partner__company_name']
+    readonly_fields = ['created_at', 'total_price']
+
+
+# ── Autres ─────────────────────────────────────────────────────────────────────
+
+@admin.register(Coupon)
+class CouponAdmin(admin.ModelAdmin):
+    list_display    = ['code', 'discount_percentage', 'is_active', 'current_uses']
+    readonly_fields = ['created_at', 'current_uses']
+
+admin.site.register(PartnerContract)
+admin.site.register(AdminNotification)
+admin.site.register(PartnerEventMedia)
+
+def activate_payment(modeladmin, request, queryset):
+    count = queryset.update(payment_status='active')
+    messages.success(request, f"{count} paiement(s) activé(s).")
+activate_payment.short_description = "💚 Activer le paiement"
+
+def deactivate_payment(modeladmin, request, queryset):
+    count = 0
+    for partner in queryset:
+        partner.payment_status = 'not_active'
+        partner.account_frozen = True
+        partner.save(update_fields=['payment_status', 'account_frozen'])
+        count += 1
+    messages.success(request, f"{count} paiement(s) désactivé(s) + compte(s) suspendu(s).")
+deactivate_payment.short_description = "🔴 Désactiver le paiement + suspendre"

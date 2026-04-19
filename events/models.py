@@ -1,4 +1,5 @@
 import uuid
+from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -13,7 +14,7 @@ class Event(models.Model):
     )
 
     id          = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    partner     = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='events_managed')
+    partner     = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='events_managed')
     title       = models.CharField(max_length=255, verbose_name=_("Title"))
     description = models.TextField(verbose_name=_("Description"))
     start_date  = models.DateTimeField(verbose_name=_("Start Date"))

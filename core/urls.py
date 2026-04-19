@@ -2,10 +2,11 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, RedirectView
 from django.contrib.auth.decorators import login_required
 from strawberry.django.views import AsyncGraphQLView
 from api.schema import schema
+from guard.views import ReceiptListView
 
 admin_url = f"{settings.DJANGO_ADMIN_URL.strip('/')}/"
 
@@ -18,9 +19,10 @@ urlpatterns = [
     path('', include('guard.urls', namespace='guard')),
     path("", include("shared.urls")),
     path("graphql/", AsyncGraphQLView.as_view(schema=schema)),
+    # / → redirige vers login
+    path("", RedirectView.as_view(url="/auth/login/", permanent=False), name="root"),
+    path("partners/receipt", ReceiptListView.as_view(), name="receipt_list"),
 ]
-   
-
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

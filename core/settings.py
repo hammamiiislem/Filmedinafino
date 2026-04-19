@@ -27,10 +27,10 @@ INSTALLED_APPS = [
     "api",
     "guard",
     "shared",
-    "advertisements",
     "events",
     "partners",
 ]
+AUTH_USER_MODEL = 'guard.GuardUser'
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -49,7 +49,7 @@ ROOT_URLCONF = "core.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -138,44 +138,48 @@ DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
 ADMIN_LIST_EMAILS = env.list("ADMIN_LIST_EMAILS")
 
 # Email Configuration (Unified)
+#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+#EMAIL_HOST = env("EMAIL_HOST")
+#EMAIL_PORT = env.int("EMAIL_PORT", default=587)
+#EMAIL_HOST_USER = env("EMAIL_HOST_USER")
+#EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+#EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
+#EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)
+# Configuration SMTP (Exemple Gmail)
+#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+#EMAIL_HOST = 'smtp.gmail.com'
+#EMAIL_PORT = 587
+#EMAIL_USE_TLS = True
+#EMAIL_HOST_USER = 'islemhamami345@gmail.com'
+#EMAIL_HOST_PASSWORD = 'ucethuyrpagggejk' # Ne pas utiliser ton vrai mot de passe
+#DEFAULT_FROM_EMAIL = 'FielMedina <islemhamami345@gmail.com>'
+#FRONTEND_BASE_URL = env("FRONTEND_BASE_URL", default="http://localhost:3000")
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = env("EMAIL_HOST")
-EMAIL_PORT = env.int("EMAIL_PORT", default=587)
+EMAIL_HOST = 'smtp-relay.brevo.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
 EMAIL_HOST_USER = env("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
-EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
-EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)
-
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="FielMedina <islemhamami345@gmail.com>")
+FRONTEND_BASE_URL = env("FRONTEND_BASE_URL", default="http://localhost:3000")
+CSRF_TRUSTED_ORIGINS = [
+    'https://aerobics-cushy-contour.ngrok-free.dev',
+]
 
 if DEBUG:
-    SITE_URL = "http://localhost:8000"
-    CORS_ALLOW_ALL_ORIGINS = DEBUG
-    ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
-     # 1. Badel el Backend bech ywalli SMTP (Vrai envoi)
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_HOST = 'smtp.gmail.com'
-    EMAIL_PORT = 587
-    EMAIL_USE_TLS = True
-
-    # 2. Email mte3ek elli bech tab3ath bih
-    EMAIL_HOST_USER = 'islemhamami345@gmail.com'
-
-    # 3. EL KEY (App Password): 
-    # Mat7attech mot de passe mte3ek el 3adi! 
-    # Lezem t'jib "Mot de passe d'application" (16 lettres) men Google.
-    EMAIL_HOST_PASSWORD = 'CihRMB8R5Q37o5zJpdrT' 
-
-    DEFAULT_FROM_EMAIL = 'islemhamami345@gmail.com'
+    SITE_URL = "https://aerobics-cushy-contour.ngrok-free.dev"
+    CORS_ALLOW_ALL_ORIGINS = True
+    ALLOWED_HOSTS = ['aerobics-cushy-contour.ngrok-free.dev', 'localhost', '127.0.0.1']
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": BASE_DIR / "db.sqlite3",
         }
     }
-
     STATICFILES_DIRS = [
         BASE_DIR / "static",
     ]
+ 
 
 
 else:
@@ -238,3 +242,12 @@ FIREBASE_CLIENT_CONFIG = {
     "appId": env("FIREBASE_APP_ID", default="1:797838304877:web:e586351927c5dd38954164"),
     "measurementId": env("FIREBASE_MEASUREMENT_ID", default="G-KMEWT7N3ND"),
 }
+
+# ── Konnect ───────────────────────────────────────────────────────────────────
+KONNECT_API_KEY = env("KONNECT_API_KEY", default="")
+KONNECT_WALLET_ID = env("KONNECT_WALLET_ID", default="")
+KONNECT_BASE_URL = env(
+    "KONNECT_BASE_URL",
+    default="https://api.sandbox.konnect.network/api/v2",
+)
+KONNECT_RECEIVER_WALLET_ID = env("KONNECT_RECEIVER_WALLET_ID", default="")

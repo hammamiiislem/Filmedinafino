@@ -29,6 +29,8 @@ from .views import (
     StripeWebhookView,
     EventTrackingView,
     AdTrackingView,
+    AdClickView,
+    EventClickView,
     PublicTransportListView,
     PublicTransportCreateView,
     PublicTransportUpdateView,
@@ -47,7 +49,11 @@ from .views import (
     DashboardStatsAPIView,
     record_ad_click,
     record_event_click,
+    ReceiptListView,
+    PricingSettingsView,
+    ReceiptListView,
 )
+
 from .views import verify_partner_email
 
 app_name = "guard"
@@ -61,7 +67,7 @@ urlpatterns = [
         "staff/",
         include([
             path("subscribersList/",        SubscribersListView.as_view(),       name="subscribersList"),
-
+            path("receipts/", ReceiptListView.as_view(), name="receipt_list"),
             path("locationsList/",          LocationsListView.as_view(),         name="locationsList"),
             path("locations/create/",       LocationCreateView.as_view(),        name="location_create"),
             path("locations/update/<int:pk>/", LocationUpdateView.as_view(),     name="location_update"),
@@ -121,4 +127,14 @@ urlpatterns = [
     path("api/record/ad/<int:ad_id>/",         record_ad_click,                 name="record_ad_click"),
     path("api/record/event/<int:event_id>/",   record_event_click,              name="record_event_click"),
     path('verify-email/', verify_partner_email, name='verify-email'),
+    # ── Click tracking temps réel ──────────────────────────────────
+    path("ad/<int:pk>/go/",    AdClickView.as_view(),    name="ad_click"),
+    path("event/<int:pk>/go/", EventClickView.as_view(), name="event_click"),
+
+    path(
+        "settings/pricing/",
+        PricingSettingsView.as_view(),
+        name="pricing_settings",
+    ),
+
 ]

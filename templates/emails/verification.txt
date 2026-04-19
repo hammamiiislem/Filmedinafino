@@ -1,0 +1,14 @@
+{% autoescape off %}
+Bonjour {{ company_name }},
+
+Merci de vous être inscrit sur FielMedina ! 
+Pour activer votre compte partenaire et commencer à gérer vos lieux, merci de vérifier votre adresse e-mail en cliquant sur le lien ci-dessous :
+
+{{ verification_url }}
+
+Ce lien expirera dans 24 heures.
+
+Si vous n'avez pas créé de compte, vous pouvez ignorer cet e-mail.
+
+L'équipe FielMedina
+{% endautoescape %}

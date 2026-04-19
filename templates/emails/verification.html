@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #e1e1e1; border-radius: 12px; background-color: #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .header { text-align: center; padding-bottom: 20px; border-bottom: 2px solid #f0f0f0; }
+        .header h1 { color: #2d3436; margin: 10px 0; font-size: 24px; }
+        .content { padding: 30px 0; text-align: center; }
+        .footer { text-align: center; font-size: 12px; color: #b2bec3; padding-top: 20px; border-top: 1px solid #f0f0f0; }
+        .emphasis { color: #6c5ce7; font-weight: bold; }
+        .verify-link { color: #6c5ce7; word-break: break-all; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Bienvenue chez <span class="emphasis">FielMedina</span></h1>
+        </div>
+        <div class="content">
+            <p>Bonjour <strong>{{ company_name }}</strong>,</p>
+            <p>Merci de vous être inscrit sur notre plateforme de gestion de partenaires.</p>
+            <p>Pour activer votre compte et commencer à répertorier vos lieux historiques, veuillez cliquer sur le lien ci-dessous :</p>
+            <p>
+                <a href="{{ verification_url }}" class="verify-link">{{ verification_url }}</a>
+            </p>
+            <p style="margin-top: 20px; font-size: 14px; color: #636e72;">
+                Ce lien de sécurité expirera dans <span class="emphasis">24 heures</span>.
+            </p>
+        </div>
+        <div class="footer">
+            <p>&copy; 2026 FielMedina. Tous droits réservés.</p>
+            <p>Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet email.</p>
+        </div>
+    </div>
+</body>
+</html>

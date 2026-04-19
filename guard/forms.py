@@ -22,7 +22,7 @@ from .models import (
     ImageAd,
     PublicTransport,
     PublicTransportTime,
-    Partner,
+    LegacyPartner,
     Sponsor,
 )
 
@@ -557,7 +557,7 @@ class PartnerForm(FlowbiteFormMixin, forms.ModelForm):
     )
 
     class Meta:
-        model = Partner
+        model = LegacyPartner
         fields = ["name", "email", "link", "image", "locations"]
         widgets = {
             "name": forms.TextInput(attrs={"placeholder": _("Partner name")}),

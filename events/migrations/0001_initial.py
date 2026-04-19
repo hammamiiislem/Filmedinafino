@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('guard', '0063_alter_ad_options_ad_db_clicks_count_ad_payment_ref_and_more'),
+        ('guard', '0071_guarduser_only'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 

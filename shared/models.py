@@ -12,7 +12,7 @@ from django.utils import timezone
 from django.dispatch import receiver
 from tinymce.models import HTMLField
 from django.utils.translation import gettext_lazy as _
-
+from django.conf import settings
 
 class OptimizedImageModel(models.Model):
     image = models.ImageField(upload_to="images/")
@@ -123,7 +123,6 @@ class Page(models.Model):
         return self.title
 
 
-User = get_user_model()
 
 
 class UserProfile(models.Model):
@@ -132,7 +131,7 @@ class UserProfile(models.Model):
         CLIENT_PARTNER = "client_partner", _("Client / Partners")
 
     user = models.OneToOneField(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="profile",
     )
@@ -191,7 +190,7 @@ class UserProfile(models.Model):
         return mapping.get(key, key.capitalize() or _("Pending"))
 
 
-@receiver(post_save, sender=User)
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def ensure_profile_exists(sender, instance, created, **kwargs):
     today = timezone.now().date()
     default_type = (
@@ -220,9 +219,18 @@ def ensure_profile_exists(sender, instance, created, **kwargs):
     if updated_fields:
         profile.save(update_fields=updated_fields)
 
-
 class UserPreference(models.Model):
-    user_uid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    # REMPLACE user_uid PAR CETTE FOREIGN KEY :
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.CASCADE,
+        related_name="preferences",
+        verbose_name=_("User"),
+        null=True,
+        blank=True
+    )
+    
+    # Garde le reste mais tu n'as plus besoin de user_uid comme champ principal
     first_visit = models.BooleanField(verbose_name=_("First visit"))
     traveling_with = models.CharField(max_length=20, verbose_name=_("Traveling with"))
     interests = models.JSONField(verbose_name=_("Interests"))
@@ -234,7 +242,8 @@ class UserPreference(models.Model):
         verbose_name_plural = _("User Preferences")
 
     def __str__(self):
-        return self.user_uid
+        # On affiche l'email de l'utilisateur lié
+        return f"Prefs for {self.user.email}"
 
 
 class Package(models.Model):
@@ -267,7 +276,7 @@ class Transaction(models.Model):
         COMPLETED = "completed", _("Completed")
         FAILED = "failed", _("Failed")
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="transactions")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="transactions")
     amount = models.DecimalField(max_digits=10, decimal_places=3)
     payment_method = models.CharField(max_length=50)  # flouci, konnect
     gateway_ref = models.CharField(max_length=255, blank=True, null=True)
@@ -293,3 +302,51 @@ class Transaction(models.Model):
     class Meta:
         verbose_name = _("Transaction")
         verbose_name_plural = _("Transactions")
+# ── À ajouter à la fin de shared/models.py ───────────────────────────────────
+
+class PricingSettings(models.Model):
+    """
+    Singleton — pk=1 toujours.
+    Prix configurables depuis l'admin Django.
+    """
+    boost_price_per_day = models.DecimalField(
+        max_digits=8, decimal_places=3,
+        default=5.000,
+        verbose_name=_("Prix boost événement (TND/jour)"),
+        help_text=_("Prix facturé par jour pour booster un événement partenaire.")
+    )
+    ad_price_per_day = models.DecimalField(
+        max_digits=8, decimal_places=3,
+        default=3.000,
+        verbose_name=_("Prix publicité (TND/jour)"),
+        help_text=_("Prix facturé par jour pour une publicité partenaire.")
+    )
+    updated_at = models.DateTimeField(auto_now=True)
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name='pricing_updates'
+    )
+
+    class Meta:
+        verbose_name        = _("Paramètres de prix")
+        verbose_name_plural = _("Paramètres de prix")
+
+    def __str__(self):
+        return f"Boost: {self.boost_price_per_day} TND/j | Pub: {self.ad_price_per_day} TND/j"
+
+    @classmethod
+    def get(cls) -> 'PricingSettings':
+        obj, _ = cls.objects.get_or_create(pk=1, defaults={
+            'boost_price_per_day': 5.000,
+            'ad_price_per_day':    3.000,
+        })
+        return obj
+
+    def save(self, *args, **kwargs):
+        self.pk = 1  # force singleton
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        pass  # interdit la suppression

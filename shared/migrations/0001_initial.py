@@ -18,45 +18,19 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Page",
             fields=[
-                (
-                    "id",
-                    models.BigAutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 ("slug", models.SlugField(unique=True, verbose_name="URL Slug")),
-                (
-                    "slug_en",
-                    models.SlugField(null=True, unique=True, verbose_name="URL Slug"),
-                ),
-                (
-                    "slug_fr",
-                    models.SlugField(null=True, unique=True, verbose_name="URL Slug"),
-                ),
+                ("slug_en", models.SlugField(null=True, unique=True, verbose_name="URL Slug")),
+                ("slug_fr", models.SlugField(null=True, unique=True, verbose_name="URL Slug")),
                 ("is_active", models.BooleanField(default=True, verbose_name="Active")),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 ("updated_at", models.DateTimeField(auto_now=True)),
                 ("title", models.CharField(max_length=255, verbose_name="Title")),
-                (
-                    "title_en",
-                    models.CharField(max_length=255, null=True, verbose_name="Title"),
-                ),
-                (
-                    "title_fr",
-                    models.CharField(max_length=255, null=True, verbose_name="Title"),
-                ),
+                ("title_en", models.CharField(max_length=255, null=True, verbose_name="Title")),
+                ("title_fr", models.CharField(max_length=255, null=True, verbose_name="Title")),
                 ("content", tinymce.models.HTMLField(verbose_name="Content")),
-                (
-                    "content_en",
-                    tinymce.models.HTMLField(null=True, verbose_name="Content"),
-                ),
-                (
-                    "content_fr",
-                    tinymce.models.HTMLField(null=True, verbose_name="Content"),
-                ),
+                ("content_en", tinymce.models.HTMLField(null=True, verbose_name="Content")),
+                ("content_fr", tinymce.models.HTMLField(null=True, verbose_name="Content")),
             ],
             options={
                 "verbose_name": "Page",
@@ -67,51 +41,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="UserProfile",
             fields=[
-                (
-                    "id",
-                    models.BigAutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                (
-                    "user_type",
-                    models.CharField(
-                        choices=[
-                            ("staff", "Staff"),
-                            ("client_partner", "Client / Partenaire"),
-                        ],
-                        default="client_partner",
-                        max_length=32,
-                    ),
-                ),
-                (
-                    "subscription_plan",
-                    models.CharField(
-                        blank=True,
-                        default="Trial",
-                        help_text="Placeholder until Konnect subscription is attached.",
-                        max_length=100,
-                    ),
-                ),
-                (
-                    "subscription_status",
-                    models.CharField(blank=True, default="trial", max_length=32),
-                ),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("user_type", models.CharField(choices=[("staff", "Staff"), ("client_partner", "Client / Partenaire")], default="client_partner", max_length=32)),
+                ("subscription_plan", models.CharField(blank=True, default="Trial", help_text="Placeholder until Konnect subscription is attached.", max_length=100)),
+                ("subscription_status", models.CharField(blank=True, default="trial", max_length=32)),
                 ("subscription_started_at", models.DateField(blank=True, null=True)),
                 ("subscription_renews_at", models.DateField(blank=True, null=True)),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 ("updated_at", models.DateTimeField(auto_now=True)),
-                (
-                    "user",
-                    models.OneToOneField(
-                        on_delete=django.db.models.deletion.CASCADE,
-                        related_name="profile",
-                        to=settings.AUTH_USER_MODEL,
-                    ),
-                ),
+                ("user", models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name="profile", to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 "verbose_name": "User profile",

@@ -84,6 +84,16 @@
                     </a>
                </li>
                <li>
+                    <a href="{% url 'guard:receipt_list' %}"
+                         class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                         <svg class="shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
+                              <path d="M240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM320-280h320v-80H320v80Zm0-160h320v-80H320v80ZM240-800v200-200 640-640Z"/>
+                         </svg>
+                         <span class="flex-1 ms-3 whitespace-nowrap">{% trans "Receipts" %}</span>
+                    </a>
+               </li>
+
+               <li>
                     <a href="{% url 'guard:partnersList' %}"
                          class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                          <svg class="shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
@@ -101,6 +111,15 @@
                          <span class="flex-1 ms-3 whitespace-nowrap">{% trans "Sponsors" %}</span>
                     </a>
                </li>
+               <li>
+     <a href="{% url 'guard:pricing_settings' %}"
+          class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+          <svg class="shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
+               <path d="M441-120v-86q-53-12-91.5-46T293-348l74-30q15 48 44.5 73t77.5 25q41 0 69.5-18.5T587-356q0-35-22-55.5T463-463q-77-27-123.5-57.5T293-602q0-55 37.5-90t110.5-45v-83h80v83q45 10 77.5 37.5T644-628l-74 32q-12-32-34-52t-60-20q-44 0-67 19.5T386-596q0 30 24.5 49.5T479-497q68 22 116 53t48 86q0 57-39.5 93T521-206v86h-80Z"/>
+          </svg>
+          <span class="flex-1 ms-3 whitespace-nowrap">{% trans "Pricing" %}</span>
+     </a>
+</li>
                {% endif %}
                <li>
                     <a href="{% url 'guard:eventsList' %}"

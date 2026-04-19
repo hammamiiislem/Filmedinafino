@@ -2,7 +2,7 @@ import datetime
 import logging
 import requests
 import uuid
-
+from .models import Location
 from decimal import Decimal
 from shared.utils import send_validation_email
 
@@ -42,7 +42,7 @@ from .models import (
     UserProfile, Tip, Hiking,
     Ad,
     PublicTransport, PublicTransportType,
-    Partner, Sponsor,
+    LegacyPartner, Sponsor,
     AdClick, EventClick,
 )
 from events.models import Event as NewEvent
@@ -51,9 +51,15 @@ from datetime import timedelta
 from shared.short_io import ShortIOService
 from django.core import signing
 from django.http import HttpResponse
-from guard.models import Partner
+from guard.models import LegacyPartner
 
 logger = logging.getLogger(__name__)
+
+
+class StaffRequiredMixin(UserPassesTestMixin):
+    """Reusable mixin that restricts access to staff users only."""
+    def test_func(self):
+        return self.request.user.is_staff
 
 
 # =============================================================================
@@ -106,7 +112,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                 "hikings":          Hiking.objects.count(),
                 "subscribers":      UserProfile.objects.filter(user_type=UserProfile.UserType.CLIENT_PARTNER).count(),
                 "transports":       PublicTransport.objects.count(),
-                "partners":         Partner.objects.count(),
+                "partners":         LegacyPartner.objects.count(),
                 "sponsors":         Sponsor.objects.count(),
                 "tips":             Tip.objects.count(),
                 "event_categories": EventCategory.objects.count(),
@@ -1055,38 +1061,34 @@ class AdsDashboardView(LoginRequiredMixin, TemplateView):
 # PARTNERS
 # =============================================================================
 class PartnerListView(UserPassesTestMixin, LoginRequiredMixin, ListView):
-    model = Partner; template_name = "guard/views/partners/list.html"
+    model = LegacyPartner; template_name = "guard/views/partners/list.html"
     context_object_name = "partners"; ordering = ["-id"]
     def test_func(self): return self.request.user.is_staff
 class PartnerCreateView(CreateView):
-    model = Partner
+    model = LegacyPartner
     form_class = PartnerForm
     template_name = 'guard/views/partners/index.html'
     success_url = reverse_lazy('guard:partnersList')
 
     def form_valid(self, form):
-    # 1. Isavi el Partner (name, email, logo...) f-el base
+        # 1. Save the LegacyPartner (name, email, logo...)
         self.object = form.save()
-    
-    # 2. EB3ATH L-EMAIL
+
+        # 2. Send validation email
         try:
             send_validation_email(self.object)
         except Exception as e:
             print(f"Erreur d'envoi email: {e}")
 
-    # 3. Yajbed el list mte3 el locations elli selectionnahom f-el form
+        # 3. Assign locations via M2M
         selected_locations = form.cleaned_data.get('locations')
-    
-    # 4. Reset el locations el 9dom
-        Location.objects.filter(partner=self.object).update(partner=None)
-
-    # 5. Assign el locations el jdod
+        self.object.locations.clear()
         if selected_locations:
-            selected_locations.update(partner=self.object)
-        
+            self.object.locations.set(selected_locations)
+
         return super().form_valid(form)
 class PartnerUpdateView(UserPassesTestMixin, LoginRequiredMixin, SuccessMessageMixin, UpdateView):
-    model = Partner
+    model = LegacyPartner
     form_class = PartnerForm
     template_name = "guard/views/partners/index.html"
     success_url = reverse_lazy("guard:partnersList")
@@ -1096,29 +1098,25 @@ class PartnerUpdateView(UserPassesTestMixin, LoginRequiredMixin, SuccessMessageM
         return self.request.user.is_staff
 
     def form_valid(self, form):
-        # 1. Savi el modifs el jdod mte3 el partner
+    # 1. Sauvegarde les modifications du partner
         self.object = form.save()
-        
-        # 2. (Facultatif) T-najem t3awed tba3th email ken t7eb 
-        # sinon na77i hal zouz stour:
-        # from .utils import send_partner_verification_email
-        # send_partner_verification_email(self.object, self.request)
-
-        # 3. Logic mte3 el Locations (MHEMA BARCHA)
+    
+    # 2. Logic des Locations
         selected_locations = form.cleaned_data.get('locations')
-        
-        # Reseti el locations elli kenou m3ah 9bal
-        from .models import Location
-        Location.objects.filter(partner=self.object).update(partner=None)
+    
+    # Reset les locations qui étaient liées à ce partner avant
+        Location.objects.filter(partner_id=self.object.pk).update(partner=None)
 
-        # Erbet el locations el jdod elli t-selectew f-el formulaire
+    # Lie les nouvelles locations sélectionnées dans le formulaire
         if selected_locations:
             selected_locations.update(partner=self.object)
-            
-        return super().form_valid(form)
+    
+    # ✅ Ne PAS appeler super().form_valid(form) car il re-sauvegarde
+    # On redirige manuellement vers success_url
+        return HttpResponseRedirect(self.get_success_url())
 
 class PartnerDeleteView(UserPassesTestMixin, LoginRequiredMixin, SuccessMessageMixin, DeleteView):
-    model = Partner; template_name = "guard/views/partners/delete.html"
+    model = LegacyPartner; template_name = "guard/views/partners/delete.html"
     success_url = reverse_lazy("guard:partnersList"); success_message = _("Partner deleted successfully.")
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, self.success_message); return super().delete(request, *args, **kwargs)
@@ -1189,7 +1187,7 @@ def verify_partner_email(request):
         partner_id = data.get('partner_id')
         
         # On récupère le partenaire et on le valide
-        partner = Partner.objects.get(id=partner_id)
+        partner = LegacyPartner.objects.get(id=partner_id)
         if not partner.is_verified:
             partner.is_verified = True
             partner.save()
@@ -1199,3 +1197,107 @@ def verify_partner_email(request):
 
     except (signing.SignatureExpired, signing.BadSignature):
         return HttpResponse("Le lien est invalide ou a expiré.", status=400)
+
+# ── TIPS ──────────────────────────────────────────────────────────────────────
+
+class TipsListView(StaffRequiredMixin, LoginRequiredMixin, ListView):
+    model = Tip
+    template_name = "guard/views/tips/list.html"
+    context_object_name = "tips"
+
+class TipCreateView(StaffRequiredMixin, LoginRequiredMixin, SuccessMessageMixin, CreateView):
+    model = Tip
+    form_class = TipForm
+    template_name = "guard/views/tips/index.html"
+    success_url = reverse_lazy("guard:tipsList")
+    success_message = _("Astuce créée.")
+
+class TipUpdateView(TipCreateView, UpdateView):
+    success_message = _("Astuce mise à jour.")
+
+class TipDeleteView(StaffRequiredMixin, LoginRequiredMixin, DeleteView):
+    model = Tip
+    success_url = reverse_lazy("guard:tipsList")
+       
+# ── TRACKING ──────────────────────────────────────────────────────────────────
+
+class AdTrackingView(View):
+    def get(self, request, pk):
+        ad = get_object_or_404(Ad, pk=pk)
+        return HttpResponseRedirect(ad.destination_link) if ad.destination_link else redirect('guard:adsList')
+
+class EventTrackingView(View):
+    def get(self, request, pk):
+        event = get_object_or_404(Event, pk=pk)
+        return HttpResponseRedirect(event.link) if event.link else redirect('guard:eventsList')
+
+class EventClickView(EventTrackingView): pass
+class AdClickView(AdTrackingView): pass
+# ── SUBSCRIBERS ───────────────────────────────────────────────────────────────
+
+class SubscribersListView(StaffRequiredMixin, LoginRequiredMixin, ListView):
+    model = UserProfile
+    template_name = "guard/views/subscribers/list.html"
+    context_object_name = "subscribers"
+
+@login_required
+def check_user_type(request):
+    if request.user.is_staff:
+        return redirect('guard:dashboard')
+    return redirect('/')
+# ── PRICING SETTINGS ──────────────────────────────────────────────────────────
+
+from shared.models import PricingSettings
+
+class PricingSettingsView(StaffRequiredMixin, LoginRequiredMixin, TemplateView):
+    template_name = "guard/views/pricing_settings.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["pricing"] = PricingSettings.get()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        pricing = PricingSettings.get()
+        boost = request.POST.get("boost_price_per_day")
+        ad    = request.POST.get("ad_price_per_day")
+        if boost:
+            pricing.boost_price_per_day = boost
+        if ad:
+            pricing.ad_price_per_day = ad
+        pricing.updated_by = request.user
+        pricing.save()
+        messages.success(request, "Prix mis à jour avec succès.")
+        return redirect(request.path)
+
+
+# ── RECEIPTS ──────────────────────────────────────────────────────────────────
+
+from partners.models import ReceiptHistory
+
+class ReceiptListView(StaffRequiredMixin, LoginRequiredMixin, ListView):
+    model               = ReceiptHistory
+    template_name       = "guard/views/receipts/list.html"
+    context_object_name = "receipts"
+    ordering            = ['-created_at']
+    paginate_by         = 25
+
+    def get_queryset(self):
+        qs = super().get_queryset().select_related('partner')
+        q  = self.request.GET.get('q', '').strip()
+        pt = self.request.GET.get('payment_type', '').strip()
+        if q:
+            qs = qs.filter(
+                models.Q(receipt_number__icontains=q) |
+                models.Q(sent_to_email__icontains=q)  |
+                models.Q(partner__company_name__icontains=q)
+            )
+        if pt:
+            qs = qs.filter(payment_type=pt)
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['q']            = self.request.GET.get('q', '')
+        context['payment_type'] = self.request.GET.get('payment_type', '')
+        return context
