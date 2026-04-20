@@ -544,21 +544,26 @@ class AdForm(forms.ModelForm):
         return image
 
 class PartnerForm(FlowbiteFormMixin, forms.ModelForm):
-    # Changement en ModelMultipleChoiceField pour gérer plusieurs sélections
     locations = forms.ModelMultipleChoiceField(
         queryset=Location.objects.all(),
         required=False,
         label=_("Assigned Locations"),
-        # Utilisation de CheckboxSelectMultiple
         widget=forms.CheckboxSelectMultiple(attrs={
             'class': 'space-y-2'
         }),
         help_text=_("Sélectionnez les emplacements associés à ce partenaire.")
     )
 
+    # ← AJOUT
+    password = forms.CharField(
+        label=_("Mot de passe"),
+        required=False,
+        widget=forms.TextInput(attrs={"placeholder": _("Laissez vide pour générer automatiquement")}),
+    )
+
     class Meta:
         model = LegacyPartner
-        fields = ["name", "email", "link", "image", "locations"]
+        fields = ["name", "email", "link", "image", "locations"]  # password pas ici (pas en DB)
         widgets = {
             "name": forms.TextInput(attrs={"placeholder": _("Partner name")}),
             "email": forms.EmailInput(attrs={"placeholder": _("Partner email (for validation)")}),
@@ -571,6 +576,11 @@ class PartnerForm(FlowbiteFormMixin, forms.ModelForm):
         # En mode "Edit", on pré-coche toutes les locations déjà liées
         if self.instance.pk:
             self.fields['locations'].initial = self.instance.locations.all()
+            # En mode Edit, on cache le champ password
+            self.fields['password'].widget = forms.HiddenInput()
+
+
+            
 class SponsorForm(FlowbiteFormMixin, forms.ModelForm):
     class Meta:
         model = Sponsor

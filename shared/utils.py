@@ -98,7 +98,7 @@ def resize_to_fixed(image_field, size=(300, 200)):
 
 
 
-def send_validation_email(partner):
+def send_validation_email(partner, plain_password=None):
     from django.core.mail import EmailMultiAlternatives
     from django.template.loader import render_to_string
  
@@ -106,10 +106,11 @@ def send_validation_email(partner):
     verify_url = f"{settings.SITE_URL}/verify-email/?token={token}"
  
     context = {
-    'company_name': partner.name,
-    'verification_url': verify_url,
-}
- 
+        'company_name': partner.name,
+        'verification_url': verify_url,
+        'username': getattr(partner, 'username', None) or partner.name,  # ← CORRIGÉ
+        'password': plain_password,
+    }   
     subject = f"Validez votre compte FielMedina — {partner.name}"
     text_content = render_to_string('emails/verification.txt', context)
     html_content = render_to_string('emails/verification.html', context)
@@ -127,4 +128,3 @@ def send_validation_email(partner):
         print(f"DEBUG: Email envoyé à {partner.email}")
     except Exception as e:
         print(f"Erreur d'envoi email : {e}")
- 

@@ -1071,16 +1071,22 @@ class PartnerCreateView(CreateView):
     success_url = reverse_lazy('guard:partnersList')
 
     def form_valid(self, form):
-        # 1. Save the LegacyPartner (name, email, logo...)
+    # 1. Save the LegacyPartner (name, email, logo...)
         self.object = form.save()
 
-        # 2. Send validation email
+    # 2. Récupérer le mot de passe ou en générer un automatiquement
+        import secrets, string
+        plain_password = form.cleaned_data.get('password') or ''.join(
+        secrets.choice(string.ascii_letters + string.digits) for _ in range(10)
+        )
+
+    # 3. Send validation email avec username et password
         try:
-            send_validation_email(self.object)
+            send_validation_email(self.object, plain_password=plain_password)
         except Exception as e:
             print(f"Erreur d'envoi email: {e}")
 
-        # 3. Assign locations via M2M
+    # 4. Assign locations via M2M
         selected_locations = form.cleaned_data.get('locations')
         self.object.locations.clear()
         if selected_locations:

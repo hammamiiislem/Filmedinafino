@@ -13,14 +13,24 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Bienvenue chez <span class="emphasis">FielMedina</span></h1>
-        </div>
-        <div class="content">
+    <div class="content">
             <p>Bonjour <strong>{{ company_name }}</strong>,</p>
             <p>Merci de vous être inscrit sur notre plateforme de gestion de partenaires.</p>
-            <p>Pour activer votre compte et commencer à répertorier vos lieux historiques, veuillez cliquer sur le lien ci-dessous :</p>
+
+            {% if username or password %}
+            <div style="background:#f8f4ff; border:1px solid #6c5ce7; border-radius:8px; padding:15px; margin:20px 0; text-align:left;">
+                <p style="margin:0 0 8px 0; font-weight:bold; color:#6c5ce7;">Vos identifiants de connexion :</p>
+                {% if username %}
+                <p style="margin:4px 0;"><strong>Nom d'utilisateur :</strong> {{ username }}</p>
+                {% endif %}
+                {% if password %}
+                <p style="margin:4px 0;"><strong>Mot de passe :</strong> {{ password }}</p>
+                {% endif %}
+                <p style="margin:8px 0 0 0; font-size:12px; color:#636e72;">Conservez ces informations en lieu sûr.</p>
+            </div>
+            {% endif %}
+
+            <p>Pour activer votre compte, veuillez cliquer sur le lien ci-dessous :</p>
             <p>
                 <a href="{{ verification_url }}" class="verify-link">{{ verification_url }}</a>
             </p>
