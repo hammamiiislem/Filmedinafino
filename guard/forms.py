@@ -51,6 +51,8 @@ class FlowbiteFormMixin:
             forms.CheckboxInput: self.checkbox_class,
             forms.RadioSelect: self.radio_class,
             forms.FileInput: self.file_input_class,
+            forms.CheckboxSelectMultiple: "", 
+            forms.Select: self.input_class,
         }
 
         for name, field in self.fields.items():
@@ -58,8 +60,11 @@ class FlowbiteFormMixin:
             classes = widget.attrs.get("class", "")
             
             # Determine class based on mapping, defaulting to input_class
+            if isinstance(widget, forms.CheckboxSelectMultiple):
+                continue                        
+
             base_class = next((cls for widget_type, cls in widget_css_map.items() 
-                              if isinstance(widget, widget_type)), self.input_class)
+                          if isinstance(widget, widget_type)), self.input_class)
             
             widget.attrs["class"] = f"{classes} {base_class}".strip()
             widget.attrs.setdefault("id", f"id_{name}")

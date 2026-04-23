@@ -330,15 +330,6 @@ function setSection(el, visible) {
     el.style.display = visible ? 'block' : 'none';
 }
 
-function setDisabled(section, disabled) {
-    if (!section) return;
-    section.querySelectorAll('select, input').forEach(input => {
-        input.disabled = disabled;
-        input.style.opacity = disabled ? '0.4' : '1';
-        input.style.pointerEvents = disabled ? 'none' : '';
-    });
-}
-
 // ─── Main form update ───────────────────────────────────────
 function updateTransportForm() {
     const type = transportType?.selectedOptions[0]?.text.toLowerCase() || "";
@@ -349,10 +340,6 @@ function updateTransportForm() {
     setSection(cityToCitySection, false);
     setSection(regionToRegionSection, false);
     setSection(returnJourneyWrapper, false);
-
-    // Re-enable all inputs (clean state)
-    setDisabled(cityToCitySection, false);
-    setDisabled(regionToRegionSection, false);
 
     if (type.includes('bus')) {
         setSection(cityWrapper, true);
@@ -365,37 +352,24 @@ function updateTransportForm() {
         setSection(returnJourneyWrapper, true);
 
     } else if (type.includes('metro')) {
-        // Metro: Region-to-Region par défaut, City-to-City optionnel (mais pas busNumber)
-        setSection(regionToRegionSection, true);   // Visible par défaut
-        setSection(cityToCitySection, true);       // Aussi visible pour choix optionnel
+        setSection(regionToRegionSection, true);
+        setSection(cityToCitySection, true);
         setSection(returnJourneyWrapper, true);
-        // Apply mutual exclusion based on current values
-        applyMetroMutualExclusion();
     }
 }
 
-// ─── Metro: exclusion mutuelle stricte ──────────────────────
-// Dès qu'on choisit Region → City se bloque, et vice versa.
-function applyMetroMutualExclusion() {
-    const cityFilled = !!(fromCitySelect?.value || toCitySelect?.value);
-    const regionFilled = !!(fromRegionSelect?.value || toRegionSelect?.value);
-
-    if (regionFilled) {
-        // Region sélectionnée → bloquer City-to-City
-        setDisabled(cityToCitySection, true);
-        setDisabled(regionToRegionSection, false);
-    } else if (cityFilled) {
-        // City sélectionnée → bloquer Region-to-Region
-        setDisabled(regionToRegionSection, true);
-        setDisabled(cityToCitySection, false);
-    } else {
-        // Rien → les deux actifs (Region reste le choix par défaut visuellement)
-        setDisabled(cityToCitySection, false);
-        setDisabled(regionToRegionSection, false);
-    }
+// ─── Metro: exclusion mutuelle par effacement ────────────────
+function clearCityToCity() {
+    if (fromCitySelect) fromCitySelect.value = '';
+    if (toCitySelect) toCitySelect.value = '';
 }
 
-// ─── Subregions AJAX (for Metro: load based on fromCity) ────
+function clearRegionToRegion() {
+    if (fromRegionSelect) fromRegionSelect.value = '';
+    if (toRegionSelect) toRegionSelect.value = '';
+}
+
+// ─── Subregions AJAX (for Bus and Metro) ────
 async function updateSubregions(cityId) {
     if (!cityId || !fromRegionSelect || !toRegionSelect) return;
     try {
@@ -422,43 +396,56 @@ async function updateSubregions(cityId) {
 // ─── Event Listeners ────────────────────────────────────────
 
 // Transport type change → rebuild form
-transportType?.addEventListener('change', updateTransportForm);
+transportType?.addEventListener('change', () => {
+    updateTransportForm();
+    // Clear values when switching types to avoid dirty submissions
+    clearCityToCity();
+    clearRegionToRegion();
+    if (citySelect) citySelect.value = '';
+});
 
 // Bus: city changes → reload subregions
 citySelect?.addEventListener('change', () => {
-    updateTransportForm();
-    updateSubregions(citySelect.value);
+    const type = transportType?.selectedOptions[0]?.text.toLowerCase() || "";
+    if (type.includes('bus')) {
+        updateSubregions(citySelect.value);
+    }
 });
 
-// Metro: City-to-City fields change
+// Metro: mutual exclusion (clear the other section when one is used)
 fromCitySelect?.addEventListener('change', () => {
     const type = transportType?.selectedOptions[0]?.text.toLowerCase() || "";
-    if (type.includes('metro')) {
-        applyMetroMutualExclusion();
-        if (fromCitySelect.value) updateSubregions(fromCitySelect.value);
+    if (type.includes('metro') && fromCitySelect.value) {
+        clearRegionToRegion();
     }
 });
 toCitySelect?.addEventListener('change', () => {
     const type = transportType?.selectedOptions[0]?.text.toLowerCase() || "";
-    if (type.includes('metro')) applyMetroMutualExclusion();
+    if (type.includes('metro') && toCitySelect.value) {
+        clearRegionToRegion();
+    }
 });
 
-// Metro: Region-to-Region fields change
 fromRegionSelect?.addEventListener('change', () => {
     const type = transportType?.selectedOptions[0]?.text.toLowerCase() || "";
-    if (type.includes('metro')) applyMetroMutualExclusion();
+    if (type.includes('metro') && fromRegionSelect.value) {
+        clearCityToCity();
+    }
 });
 toRegionSelect?.addEventListener('change', () => {
     const type = transportType?.selectedOptions[0]?.text.toLowerCase() || "";
-    if (type.includes('metro')) applyMetroMutualExclusion();
+    if (type.includes('metro') && toRegionSelect.value) {
+        clearCityToCity();
+    }
 });
 
 // ─── Initial run on page load ────────────────────────────────
 updateTransportForm();
 if (citySelect?.value) {
-    updateSubregions(citySelect.value);
-} else if (fromCitySelect?.value) {
-    updateSubregions(fromCitySelect.value);
+    const type = transportType?.selectedOptions[0]?.text.toLowerCase() || "";
+    if (type.includes('bus')) {
+        updateSubregions(citySelect.value);
+    }
 }
 
 // ─── Time Formset Management ───────────────────────────────

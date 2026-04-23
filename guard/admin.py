@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 from .models import GuardUser
 from django.contrib.auth.models import Group
+from .models import Location
 from django import forms
 
 
@@ -83,7 +84,14 @@ class GuardUserAdmin(admin.ModelAdmin):
         if obj is None:
             return self.add_fieldsets
         return self.fieldsets
-
+@admin.register(Location)
+class LocationAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'city', 'country']
+    search_fields = ['name']
+    
+    class Meta:
+        verbose_name = "Location"
+        verbose_name_plural = "Locations"
 
 GuardUser._meta.verbose_name = _("User")
 GuardUser._meta.verbose_name_plural = _("Users")

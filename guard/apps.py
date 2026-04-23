@@ -5,6 +5,6 @@ class GuardConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'guard'
     verbose_name = "Authentication and Authorization"
-
+    verbose_name = 'Locations' 
     def ready(self):
         import guard.signals

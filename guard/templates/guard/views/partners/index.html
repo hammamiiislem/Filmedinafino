@@ -74,18 +74,28 @@
         {{ form.locations.label }}
     </label>
     
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
-        {% for checkbox in form.locations %}
-            <div class="flex items-center">
-                <div class="flex items-center h-5">
-                    {{ checkbox.tag }}
+    {% if form.locations.field.queryset.exists %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+           {% for checkbox in form.locations %}
+                <div class="flex items-center gap-2">
+                    <input type="checkbox"
+                        name="{{ checkbox.data.name }}"
+                        value="{{ checkbox.data.value }}"
+                        id="{{ checkbox.id_for_label }}"
+                        {% if checkbox.data.selected %}checked{% endif %}
+                        class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600">
+                    <label for="{{ checkbox.id_for_label }}"
+                        class="text-sm text-gray-700 dark:text-gray-300 cursor-pointer select-none">
+                        {{ checkbox.choice_label }}
+                    </label>
                 </div>
-                <label for="{{ checkbox.id_for_label }}" class="ml-3 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
-                    {{ checkbox.choice_label }}
-                </label>
-            </div>
-        {% endfor %}
+            {% endfor %}
         </div>
+    {% else %}
+        <div class="p-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300" role="alert">
+            {% trans "Aucune localisation disponible pour le moment. Veuillez créer des localisations d'abord." %}
+        </div>
+    {% endif %}
 
     {% if form.locations.help_text %}
         <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
