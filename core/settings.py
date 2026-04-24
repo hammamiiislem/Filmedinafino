@@ -137,23 +137,7 @@ LOGOUT_REDIRECT_URL = "shared:login"
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
 ADMIN_LIST_EMAILS = env.list("ADMIN_LIST_EMAILS")
 
-# Email Configuration (Unified)
-#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-#EMAIL_HOST = env("EMAIL_HOST")
-#EMAIL_PORT = env.int("EMAIL_PORT", default=587)
-#EMAIL_HOST_USER = env("EMAIL_HOST_USER")
-#EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
-#EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
-#EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)
-# Configuration SMTP (Exemple Gmail)
-#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-#EMAIL_HOST = 'smtp.gmail.com'
-#EMAIL_PORT = 587
-#EMAIL_USE_TLS = True
-#EMAIL_HOST_USER = 'islemhamami345@gmail.com'
-#EMAIL_HOST_PASSWORD = 'ucethuyrpagggejk' # Ne pas utiliser ton vrai mot de passe
-#DEFAULT_FROM_EMAIL = 'FielMedina <islemhamami345@gmail.com>'
-#FRONTEND_BASE_URL = env("FRONTEND_BASE_URL", default="http://localhost:3000")
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp-relay.brevo.com'
 EMAIL_PORT = 587

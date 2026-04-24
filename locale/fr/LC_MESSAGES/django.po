@@ -2238,3 +2238,32 @@ msgstr "Ajouter l'emplacement suivant"
 
 msgid "Remove"
 msgstr "Supprimer"
+
+msgid "Bonjour %(name)s"
+msgstr "Hello %(name)s"
+
+msgid "Merci de vous être inscrit sur notre plateforme de gestion de partenaires."
+msgstr "Thank you for registering on our partner management platform."
+
+msgid "Nom d'utilisateur :"
+msgstr "Username:"
+
+msgid "Mot de passe :"
+msgstr "Password:"
+
+msgid "Conservez ces informations en lieu sûr."
+msgstr "Keep this information in a safe place."
+
+msgid "Pour activer votre compte, veuillez cliquer sur le lien ci-dessous :"
+msgstr "To activate your account, please click the link below:"
+
+msgid "Ce lien de sécurité expirera dans 24 heures."
+msgstr "This security link will expire in 24 hours."
+
+msgid "Tous droits réservés."
+msgstr "All rights reserved."
+
+msgid "Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet email."
+msgstr "If you did not make this request, you can ignore this email."
+
+

@@ -1,4 +1,4 @@
-{% autoescape off %}
+{% load i18n %}{% autoescape off %}
 Bonjour {{ company_name }},
 
 Merci de vous être inscrit sur FielMedina !

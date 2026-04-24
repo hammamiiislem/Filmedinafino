@@ -5,6 +5,9 @@ import uuid
 from .models import Location
 from decimal import Decimal
 from shared.utils import send_validation_email
+import threading
+import secrets
+import string
 
 from django.conf import settings
 from django.contrib import messages
@@ -1064,61 +1067,59 @@ class PartnerListView(UserPassesTestMixin, LoginRequiredMixin, ListView):
     model = LegacyPartner; template_name = "guard/views/partners/list.html"
     context_object_name = "partners"; ordering = ["-id"]
     def test_func(self): return self.request.user.is_staff
-class PartnerCreateView(CreateView):
+class PartnerCreateView(UserPassesTestMixin, LoginRequiredMixin, CreateView):
     model = LegacyPartner
     form_class = PartnerForm
     template_name = 'guard/views/partners/index.html'
     success_url = reverse_lazy('guard:partnersList')
 
+    def test_func(self):
+        return self.request.user.is_staff
+
     def form_valid(self, form):
-    # 1. Save the LegacyPartner (name, email, logo...)
         self.object = form.save()
 
-    # 2. Récupérer le mot de passe ou en générer un automatiquement
-        import secrets, string
         plain_password = form.cleaned_data.get('password') or ''.join(
-        secrets.choice(string.ascii_letters + string.digits) for _ in range(10)
+            secrets.choice(string.ascii_letters + string.digits) for _ in range(10)
         )
 
-    # 3. Send validation email avec username et password
-        try:
-            send_validation_email(self.object, plain_password=plain_password)
-        except Exception as e:
-            print(f"Erreur d'envoi email: {e}")
+        # ✅ Email en arrière-plan — ne bloque plus la requête
+        def send_email_async():
+            try:
+                send_validation_email(self.object, plain_password=plain_password)
+            except Exception as e:
+                print(f"Erreur d'envoi email: {e}")
 
-    # 4. Assign locations via M2M
+        threading.Thread(target=send_email_async, daemon=True).start()
+
         selected_locations = form.cleaned_data.get('locations')
         self.object.locations.clear()
         if selected_locations:
             self.object.locations.set(selected_locations)
 
-        return super().form_valid(form)
-class PartnerUpdateView(UserPassesTestMixin, LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+        # ✅ Message affiché manuellement (sans dépendre de SuccessMessageMixin)
+        messages.success(self.request, _("Partner created successfully."))
+        return HttpResponseRedirect(self.get_success_url())
+class PartnerUpdateView(UserPassesTestMixin, LoginRequiredMixin, UpdateView):
     model = LegacyPartner
     form_class = PartnerForm
     template_name = "guard/views/partners/index.html"
     success_url = reverse_lazy("guard:partnersList")
-    success_message = _("Partner updated successfully.")
 
     def test_func(self):
         return self.request.user.is_staff
 
     def form_valid(self, form):
-    # 1. Sauvegarde les modifications du partner
         self.object = form.save()
-    
-    # 2. Logic des Locations
-        selected_locations = form.cleaned_data.get('locations')
-    
-    # Reset les locations qui étaient liées à ce partner avant
-        Location.objects.filter(partner_id=self.object.pk).update(partner=None)
 
-    # Lie les nouvelles locations sélectionnées dans le formulaire
+        selected_locations = form.cleaned_data.get('locations')
+
+        # ✅ Même logique que CreateView — M2M uniquement
+        self.object.locations.clear()
         if selected_locations:
-            selected_locations.update(partner=self.object)
-    
-    # ✅ Ne PAS appeler super().form_valid(form) car il re-sauvegarde
-    # On redirige manuellement vers success_url
+            self.object.locations.set(selected_locations)
+
+        messages.success(self.request, _("Partner updated successfully."))
         return HttpResponseRedirect(self.get_success_url())
 
 class PartnerDeleteView(UserPassesTestMixin, LoginRequiredMixin, SuccessMessageMixin, DeleteView):
