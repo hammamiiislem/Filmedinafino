@@ -25,9 +25,10 @@ class PartnerType:
     status: auto
     created_at: auto
 
-    @strawberry.field
-    def locations(self, root) -> List[strawberry.LazyType["LocationType", "api.schema"]]:
-        return root.owned_locations.all()
+@strawberry.field
+def locations(self, root) -> List["LocationType"]:
+    from api.schema import LocationType
+    return root.owned_locations.all()
 
 @strawberry.type
 class PartnerPayload:
