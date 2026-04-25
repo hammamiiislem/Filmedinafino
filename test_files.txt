@@ -1,0 +1,3 @@
+.\guard\models.py
+.\guard\views.py
+.\core\settings.py

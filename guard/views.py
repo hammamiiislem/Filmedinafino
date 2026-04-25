@@ -22,7 +22,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from django.utils.translation import gettext as _
+from django.utils.translation import get_language, gettext_lazy as _
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import (
@@ -1084,9 +1084,11 @@ class PartnerCreateView(UserPassesTestMixin, LoginRequiredMixin, CreateView):
         )
 
         # ✅ Email en arrière-plan — ne bloque plus la requête
+        current_lang = get_language()
         def send_email_async():
             try:
-                send_validation_email(self.object, plain_password=plain_password)
+                send_validation_email(self.object, plain_password=plain_password, lang=current_lang)
+                print(f"DEBUG: Email envoyé à {self.object.email} in {current_lang}")
             except Exception as e:
                 print(f"Erreur d'envoi email: {e}")
 
@@ -1097,7 +1099,6 @@ class PartnerCreateView(UserPassesTestMixin, LoginRequiredMixin, CreateView):
         if selected_locations:
             self.object.locations.set(selected_locations)
 
-        # ✅ Message affiché manuellement (sans dépendre de SuccessMessageMixin)
         messages.success(self.request, _("Partner created successfully."))
         return HttpResponseRedirect(self.get_success_url())
 class PartnerUpdateView(UserPassesTestMixin, LoginRequiredMixin, UpdateView):

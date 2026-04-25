@@ -1,0 +1,14 @@
+BBBBBBB BBBBBBBBBBBBBBBBBBBBBBB
+BBBB BBBBBB BBBB
+
+BBBBB BBBBB
+     BB BBBBBB
+           gettext(u'Edit Subscriber') 
+     BBBB
+           gettext(u'Add Subscriber') 
+     BBBBB
+BBBBBBBB BBBBB
+
+BBBBB BBBB
+   XXX XXXXXXXXXXXXXXX XXXXXXXXX XXXXXXXXXXXXXXXXXBB BBBBBB gettext(u'Edit Subscriber') BBBB gettext(u'Add Subscriber') BBBBBXXXXX
+BBBBBBBB BBBB

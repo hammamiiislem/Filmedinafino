@@ -4,86 +4,62 @@
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
         .container { max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #e1e1e1; border-radius: 12px; background-color: #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .header { text-align: center; padding-bottom: 20px; border-bottom: 2px solid #f0f0f0; }
-        .header h1 { color: #2d3436; margin: 10px 0; font-size: 24px; }
-        .content { padding: 30px 0; text-align: center; }
-        .footer { text-align: center; font-size: 12px; color: #b2bec3; padding-top: 20px; border-top: 1px solid #f0f0f0; }
+        .content { padding: 30px 20px; text-align: center; }
+        .footer { text-align: center; font-size: 12px; color: #b2bec3; padding-top: 20px; border-top: 1px solid #f0f0f0; padding-bottom: 20px; }
         .emphasis { color: #6c5ce7; font-weight: bold; }
         .verify-link { color: #6c5ce7; word-break: break-all; font-size: 14px; }
-
-        /* Header banner */
         .brand-header {
             background: linear-gradient(135deg, #1a2a4a 0%, #0d1b35 100%);
             border-radius: 12px 12px 0 0;
             padding: 35px 20px 30px;
             text-align: center;
         }
-        .brand-icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 56px;
-            height: 56px;
-            background-color: #c0622a;
-            border-radius: 10px;
-            margin-bottom: 18px;
-        }
-        .brand-icon svg {
-            width: 32px;
-            height: 32px;
-            fill: #ffffff;
-        }
-        .brand-header h1 {
-            color: #ffffff;
-            font-size: 22px;
-            font-weight: 700;
-            margin: 0 0 6px 0;
-        }
-        .brand-header p {
-            color: #a0aec0;
-            font-size: 14px;
-            margin: 0;
-        }
+        .brand-header h1 { color: #ffffff; font-size: 22px; font-weight: 700; margin: 0 0 6px 0; }
+        .brand-header p { color: #a0aec0; font-size: 14px; margin: 0; }
     </style>
 </head>
 <body>
-    {% load i18n %}
+{% load i18n static %}
 
-    <!-- FielMedina Header Banner -->
+<div class="container">
+
     <div class="brand-header">
-        <img src="{% static 'icon.png' %}" alt="FielMedina" style="width:56px; height:56px; border-radius:10px; margin-bottom:18px;">
-        <h1>Vérification de votre compte</h1>
-        <p>Activation du compte partenaire</p>
+        <img src="{{ icon_url }}" alt="FielMedina" style="width:56px; height:56px; border-radius:10px; display:block; margin:0 auto 18px auto;">
+        <h1>{% trans "Vérification de votre compte" %}</h1>
+        <p>{% trans "Activation du compte partenaire" %}</p>
     </div>
 
     <div class="content">
-        <p>Bonjour <strong>{{ company_name }}</strong>,</p>
-        <p>Merci de vous être inscrit sur notre plateforme de gestion de partenaires.</p>
+        <p>{% blocktrans %}Bonjour <strong>{{ company_name }}</strong>,{% endblocktrans %}</p>
+        <p>{% trans "Merci de vous être inscrit sur notre plateforme de gestion de partenaires." %}</p>
 
         {% if username or password %}
         <div style="background:#f8f4ff; border:1px solid #6c5ce7; border-radius:8px; padding:15px; margin:20px 0; text-align:left;">
-            <p style="margin:0 0 8px 0; font-weight:bold; color:#6c5ce7;">Vos identifiants de connexion :</p>
+            <p style="margin:0 0 8px 0; font-weight:bold; color:#6c5ce7;">{% trans "Vos identifiants de connexion :" %}</p>
             {% if username %}
-            <p style="margin:4px 0;"><strong>Nom d'utilisateur :</strong> {{ username }}</p>
+            <p style="margin:4px 0;"><strong>{% trans "Nom d'utilisateur :" %}</strong> {{ username }}</p>
             {% endif %}
             {% if password %}
-            <p style="margin:4px 0;"><strong>Mot de passe :</strong> {{ password }}</p>
+            <p style="margin:4px 0;"><strong>{% trans "Mot de passe :" %}</strong> {{ password }}</p>
             {% endif %}
-            <p style="margin:8px 0 0 0; font-size:12px; color:#636e72;">Conservez ces informations en lieu sûr.</p>
+            <p style="margin:8px 0 0 0; font-size:12px; color:#636e72;">{% trans "Conservez ces informations en lieu sûr." %}</p>
         </div>
         {% endif %}
 
-        <p>Pour activer votre compte, veuillez cliquer sur le lien ci-dessous :</p>
+        <p>{% trans "Pour activer votre compte, veuillez cliquer sur le lien ci-dessous :" %}</p>
         <p>
             <a href="{{ verification_url }}" class="verify-link">{{ verification_url }}</a>
         </p>
         <p style="margin-top: 20px; font-size: 14px; color: #636e72;">
-            Ce lien de sécurité expirera dans <span class="emphasis">24 heures</span>.
+            {% blocktrans %}Ce lien de sécurité expirera dans <span class="emphasis">24 heures</span>.{% endblocktrans %}
         </p>
     </div>
+
     <div class="footer">
-        <p>&copy; 2026 FielMedina. Tous droits réservés.</p>
-        <p>Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet email.</p>
+        <p>{% trans "&copy; 2026 FielMedina. Tous droits réservés." %}</p>
+        <p>{% trans "Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet email." %}</p>
     </div>
+
+</div>
 </body>
 </html>

@@ -1,0 +1,446 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-24 23:29+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: .\guard\models.py:64 .\guard\models.py:273 .\guard\models.py:499
+#: .\guard\models.py:537
+msgid "Name"
+msgstr ""
+
+#: .\guard\models.py:65
+msgid "Marker Image (The real world target)"
+msgstr ""
+
+#: .\guard\models.py:65
+msgid "Image representing the real world site for recognition"
+msgstr ""
+
+#: .\guard\models.py:66
+msgid "3D Model or Historical Overlay"
+msgstr ""
+
+#: .\guard\models.py:66
+msgid ".glb or .usdz file containing the historical reconstruction"
+msgstr ""
+
+#: .\guard\models.py:67
+msgid "Historical Description"
+msgstr ""
+
+#: .\guard\models.py:72
+msgid "AR Historical Content"
+msgstr ""
+
+#: .\guard\models.py:73
+msgid "AR Historical Contents"
+msgstr ""
+
+#: .\guard\models.py:86
+msgid "Ad Image"
+msgstr ""
+
+#: .\guard\models.py:87
+msgid "Ad Images"
+msgstr ""
+
+#: .\guard\models.py:99
+msgid "Hiking Image"
+msgstr ""
+
+#: .\guard\models.py:100
+msgid "Hiking Images"
+msgstr ""
+
+#: .\guard\models.py:112
+msgid "Location Image"
+msgstr ""
+
+#: .\guard\models.py:113
+msgid "Location Images"
+msgstr ""
+
+#: .\guard\models.py:125
+msgid "Event Image"
+msgstr ""
+
+#: .\guard\models.py:126
+msgid "Event Images"
+msgstr ""
+
+#: .\guard\models.py:143
+msgid "Location Category"
+msgstr ""
+
+#: .\guard\models.py:144
+msgid "Location Categories"
+msgstr ""
+
+#: .\guard\models.py:151
+msgid "Sunday"
+msgstr ""
+
+#: .\guard\models.py:152
+msgid "Monday"
+msgstr ""
+
+#: .\guard\models.py:153
+msgid "Tuesday"
+msgstr ""
+
+#: .\guard\models.py:154
+msgid "Wednesday"
+msgstr ""
+
+#: .\guard\models.py:155
+msgid "Thursday"
+msgstr ""
+
+#: .\guard\models.py:156
+msgid "Friday"
+msgstr ""
+
+#: .\guard\models.py:157
+msgid "Saturday"
+msgstr ""
+
+#: .\guard\models.py:160
+msgid "Day"
+msgstr ""
+
+#: .\guard\models.py:163
+msgid "Weekday"
+msgstr ""
+
+#: .\guard\models.py:164
+msgid "Weekdays"
+msgstr ""
+
+#: .\guard\models.py:182 .\guard\models.py:307
+msgid "Category"
+msgstr ""
+
+#: .\guard\models.py:192 .\guard\models.py:520
+msgid "Partner"
+msgstr ""
+
+#: .\guard\models.py:202
+msgid "Country"
+msgstr ""
+
+#: .\guard\models.py:210 .\guard\models.py:306 .\guard\models.py:461
+msgid "City"
+msgstr ""
+
+#: .\guard\models.py:215
+msgid "Active Ads"
+msgstr ""
+
+#: .\guard\models.py:216
+msgid "Story"
+msgstr ""
+
+#: .\guard\models.py:219
+msgid "Open From"
+msgstr ""
+
+#: .\guard\models.py:222
+msgid "Add opening hours if the location is open from a specific time"
+msgstr ""
+
+#: .\guard\models.py:225
+msgid "Open To"
+msgstr ""
+
+#: .\guard\models.py:228
+msgid "Add opening hours if the location is open to a specific time"
+msgstr ""
+
+#: .\guard\models.py:233
+msgid "Admission Fee"
+msgstr ""
+
+#: .\guard\models.py:236
+msgid "Add admission fee if the location has a specific admission fee"
+msgstr ""
+
+#: .\guard\models.py:240
+msgid "Closed Days"
+msgstr ""
+
+#: .\guard\models.py:246 .\guard\models.py:275 .\guard\models.py:309
+msgid "Location"
+msgstr ""
+
+#: .\guard\models.py:247 .\guard\models.py:512
+msgid "Locations"
+msgstr ""
+
+#: .\guard\models.py:272 .\guard\models.py:337
+msgid "Cities"
+msgstr ""
+
+#: .\guard\models.py:274 .\guard\models.py:317
+msgid "Description"
+msgstr ""
+
+#: .\guard\models.py:280
+msgid "Hiking"
+msgstr ""
+
+#: .\guard\models.py:281
+msgid "Hikings"
+msgstr ""
+
+#: .\guard\models.py:296
+msgid "Event Category"
+msgstr ""
+
+#: .\guard\models.py:297
+msgid "Event Categories"
+msgstr ""
+
+#: .\guard\models.py:305 .\guard\models.py:365
+msgid "Client"
+msgstr ""
+
+#: .\guard\models.py:310
+msgid "Start Date"
+msgstr ""
+
+#: .\guard\models.py:311
+msgid "End Date"
+msgstr ""
+
+#: .\guard\models.py:312
+msgid "Time"
+msgstr ""
+
+#: .\guard\models.py:313
+msgid "Price"
+msgstr ""
+
+#: .\guard\models.py:314
+msgid "The link to subscribe"
+msgstr ""
+
+#: .\guard\models.py:324
+msgid "Event"
+msgstr ""
+
+#: .\guard\models.py:325
+msgid "Events"
+msgstr ""
+
+#: .\guard\models.py:341
+msgid "Tip"
+msgstr ""
+
+#: .\guard\models.py:342
+msgid "Tips"
+msgstr ""
+
+#: .\guard\models.py:354
+msgid "En attente de paiement"
+msgstr ""
+
+#: .\guard\models.py:355 .\guard\models.py:378
+msgid "Active"
+msgstr ""
+
+#: .\guard\models.py:356
+msgid "TerminÃ©e"
+msgstr ""
+
+#: .\guard\models.py:360
+msgid "Nom de la pub"
+msgstr ""
+
+#: .\guard\models.py:361
+msgid "Pays"
+msgstr ""
+
+#: .\guard\models.py:362
+msgid "Ville"
+msgstr ""
+
+#: .\guard\models.py:367
+msgid "Taille : 320x50 pixels"
+msgstr ""
+
+#: .\guard\models.py:367
+msgid "Image Mobile (320x50)"
+msgstr ""
+
+#: .\guard\models.py:368
+msgid "Taille : 728x90 pixels"
+msgstr ""
+
+#: .\guard\models.py:368
+msgid "Image Tablette (728x90)"
+msgstr ""
+
+#: .\guard\models.py:369
+msgid "Lien"
+msgstr ""
+
+#: .\guard\models.py:374
+msgid "Date de dÃ©but"
+msgstr ""
+
+#: .\guard\models.py:375
+msgid "Date de fin"
+msgstr ""
+
+#: .\guard\models.py:377
+msgid "PayÃ©e"
+msgstr ""
+
+#: .\guard\models.py:385
+msgid "Statut"
+msgstr ""
+
+#: .\guard\models.py:390
+msgid "Pub"
+msgstr ""
+
+#: .\guard\models.py:391
+msgid "Pubs"
+msgstr ""
+
+#: .\guard\models.py:450 .\guard\models.py:460
+msgid "Public Transport Type"
+msgstr ""
+
+#: .\guard\models.py:451
+msgid "Public Transport Types"
+msgstr ""
+
+#: .\guard\models.py:462
+msgid "From City"
+msgstr ""
+
+#: .\guard\models.py:463
+msgid "To City"
+msgstr ""
+
+#: .\guard\models.py:464
+msgid "From Region"
+msgstr ""
+
+#: .\guard\models.py:465
+msgid "To Region"
+msgstr ""
+
+#: .\guard\models.py:466
+msgid "Line Number"
+msgstr ""
+
+#: .\guard\models.py:467
+msgid "Is Return Journey"
+msgstr ""
+
+#: .\guard\models.py:467
+msgid "Check this box if this is a return journey"
+msgstr ""
+
+#: .\guard\models.py:470 .\guard\models.py:483
+msgid "Public Transport"
+msgstr ""
+
+#: .\guard\models.py:471
+msgid "Public Transports"
+msgstr ""
+
+#: .\guard\models.py:484
+msgid "Departure Time"
+msgstr ""
+
+#: .\guard\models.py:485
+msgid "Return Time"
+msgstr ""
+
+#: .\guard\models.py:488
+msgid "Public Transport Time"
+msgstr ""
+
+#: .\guard\models.py:489
+msgid "Public Transport Times"
+msgstr ""
+
+#: .\guard\models.py:502
+msgid "Email"
+msgstr ""
+
+#: .\guard\models.py:504 .\guard\models.py:538
+msgid "Image"
+msgstr ""
+
+#: .\guard\models.py:505 .\guard\models.py:539
+msgid "Link"
+msgstr ""
+
+#: .\guard\models.py:516
+msgid "Is Verified"
+msgstr ""
+
+#: .\guard\models.py:521
+msgid "Partners"
+msgstr ""
+
+#: .\guard\models.py:542
+msgid "sponsor"
+msgstr ""
+
+#: .\guard\models.py:543
+msgid "sponsors"
+msgstr ""
+
+#: .\guard\models.py:580
+msgid "Ad Click Record"
+msgstr ""
+
+#: .\guard\models.py:581
+msgid "Ad Click Records"
+msgstr ""
+
+#: .\guard\models.py:589
+msgid "Event Click Record"
+msgstr ""
+
+#: .\guard\models.py:590
+msgid "Event Click Records"
+msgstr ""
+
+#: .\guard\models.py:619 .\guard\models.py:620
+msgid "Dashboard Statistics"
+msgstr ""
+
+#: .\guard\models.py:638
+msgid "Activity Log"
+msgstr ""
+
+#: .\guard\models.py:639
+msgid "Activity Logs"
+msgstr ""
+
+#: .\guard\models.py:658
+msgid "Notification Log"
+msgstr ""
+
+#: .\guard\models.py:659
+msgid "Notification Logs"
+msgstr ""

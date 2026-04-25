@@ -6,6 +6,7 @@ from django.core import signing
 # --- LES AJOUTS ICI ---
 from django.core.mail import send_mail
 from django.conf import settings
+from django.utils.translation import activate, gettext as _
 
 def optimize_image(image_field, resize_width=None):
     """
@@ -98,9 +99,11 @@ def resize_to_fixed(image_field, size=(300, 200)):
 
 
 
-def send_validation_email(partner, plain_password=None):
+def send_validation_email(partner, plain_password=None, lang='fr'):
     from django.core.mail import EmailMultiAlternatives
     from django.template.loader import render_to_string
+ 
+    activate(lang)
  
     token = signing.dumps({'partner_id': partner.id})
     verify_url = f"{settings.SITE_URL}/verify-email/?token={token}"
@@ -110,8 +113,9 @@ def send_validation_email(partner, plain_password=None):
         'verification_url': verify_url,
         'username': getattr(partner, 'username', None) or partner.name,  # ← CORRIGÉ
         'password': plain_password,
+        'icon_url': f"{settings.SITE_URL}/static/icon.png",
     }   
-    subject = f"Validez votre compte FielMedina — {partner.name}"
+    subject = _("Validez votre compte FielMedina — %(partner_name)s") % {'partner_name': partner.name}
     text_content = render_to_string('emails/verification.txt', context)
     html_content = render_to_string('emails/verification.html', context)
  
