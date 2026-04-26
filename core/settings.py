@@ -147,7 +147,7 @@ EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="FielMedina <islemhamami345@gmail.com>")
 FRONTEND_BASE_URL = env("FRONTEND_BASE_URL", default="http://localhost:3000")
 CSRF_TRUSTED_ORIGINS = [
-    'https://aerobics-cushy-contour.ngrok-free.dev',
+    'https://fielmedina.onrender.com',
 ]
 
 if DEBUG:
@@ -172,7 +172,10 @@ else:
         "https://fielmedina.com",
         "https://www.fielmedina.com",
     ]
-    ALLOWED_HOSTS = ["mystory.fielmedina.com"]
+    ALLOWED_HOSTS = [
+        "mystory.fielmedina.com"
+        "fielmedina.onrender.com", 
+        ]
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
