@@ -151,9 +151,9 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 if DEBUG:
-    SITE_URL = "https://aerobics-cushy-contour.ngrok-free.dev"
+    SITE_URL = "http://localhost:8000"
     CORS_ALLOW_ALL_ORIGINS = True
-    ALLOWED_HOSTS = ['aerobics-cushy-contour.ngrok-free.dev', 'localhost', '127.0.0.1']
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
@@ -167,15 +167,16 @@ if DEBUG:
 
 
 else:
-    SITE_URL = env("SITE_URL")
+    SITE_URL = env("SITE_URL", default="https://fielmedina.com")
     CORS_ALLOWED_ORIGINS = [
         "https://fielmedina.com",
         "https://www.fielmedina.com",
-    ]
+    ]   
     ALLOWED_HOSTS = [
         "mystory.fielmedina.com",
-        "fielmedina.onrender.com", 
-        ]
+        "fielmedina.onrender.com",
+        "fielmedina.com",
+    ]
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",

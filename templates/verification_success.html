@@ -236,6 +236,7 @@
     </style>
 </head>
 <body>
+{% load i18n static %}
     <div class="bg"></div>
     <div class="grid"></div>
 
@@ -251,21 +252,21 @@
             </div>
         </div>
 
-        <h1>Bienvenue,<br><span class="name">{{ name }}</span> !</h1>
+        <h1>{% trans "Welcome, " %}<br><span class="name">{{ name }}</span> !</h1>
 
         <div class="divider"></div>
 
-        <p>Votre compte partenaire a été vérifié avec succès. Vous faites maintenant partie de la communauté FielMedina.</p>
+        <p>{% trans "Your partner account has been successfully verified. You are now part of the FielMedina community." %}</p>
 
         <div class="card">
-            <div class="card-item"><span class="dot"></span> Compte vérifié et actif</div>
-            <div class="card-item"><span class="dot"></span> Accès aux fonctionnalités partenaire</div>
-            <div class="card-item"><span class="dot"></span> Visibilité sur la plateforme</div>
+            <div class="card-item"><span class="dot"></span>{% trans "Your partner account has been successfully verified." %}</div>
+            <div class="card-item"><span class="dot"></span>{% trans "Access to partner features" %}</div>
+            <div class="card-item"><span class="dot"></span>{% trans "Visibility on the platform" %}</div>
         </div>
 
-        <a href="/" class="btn">Accéder à la plateforme →</a>
+        <a href="/" class="btn">{% trans "Access the platform" %} →</a>
 
-        <div class="footer">© 2026 FielMedina · Tous droits réservés</div>
+        <div class="footer">{% trans "© 2026 FielMedina · All rights reserved." %}</div>
     </div>
 </body>
 </html>

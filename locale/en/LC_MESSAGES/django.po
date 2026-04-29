@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-24 23:22+0100\n"
+"POT-Creation-Date: 2026-04-29 10:08+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,6 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
 #: .\events\admin.py:22 .\events\admin.py:31
 msgid "1 event was"
 msgstr ""
@@ -2889,84 +2890,91 @@ msgstr ""
 msgid "Page deleted successfully."
 msgstr ""
 
-#: .\templates\emails\verification.html:28
-msgid "Vérification de votre compte"
-msgstr "Account Verification"
+#: .\templates\emails\verification.html:26
+msgid "Verify your account"
+msgstr ""
 
-#: .\templates\emails\verification.html:29
-msgid "Activation du compte partenaire"
-msgstr "Partner account activation"
+#: .\templates\emails\verification.html:27
+msgid "Partner account activation"
+msgstr ""
 
-#: .\templates\emails\verification.html:33
-#, python-format
-msgid "Bonjour <strong>%(company_name)s</strong>,"
+#: .\templates\emails\verification.html:30
+#, fuzzy, python-format
+#| msgid "Bonjour <strong>%(company_name)s</strong>,"
+msgid "Hello <strong>%(company_name)s</strong>,"
 msgstr "Hello <strong>%(company_name)s</strong>,"
 
-#: .\templates\emails\verification.html:34
-msgid ""
-"Merci de vous être inscrit sur notre plateforme de gestion de partenaires."
-msgstr "Thank you for registering on our partner management platform."
+#: .\templates\emails\verification.html:31
+msgid "Thank you for registering on our partner management platform."
+msgstr ""
 
-#: .\templates\emails\verification.html:38
+#: .\templates\emails\verification.html:35
 #: .\templates\emails\verification.txt:7
-msgid "Vos identifiants de connexion :"
-msgstr "Your login credentials:"
+msgid "Your login credentials:"
+msgstr ""
+
+#: .\templates\emails\verification.html:37
+#: .\templates\emails\verification.txt:8
+msgid "Username:"
+msgstr ""
 
 #: .\templates\emails\verification.html:40
-#: .\templates\emails\verification.txt:8
-msgid "Nom d'utilisateur :"
-msgstr "Username:"
+#: .\templates\emails\verification.txt:9
+msgid "Password:"
+msgstr ""
 
-#: .\templates\emails\verification.html:43
-msgid "Mot de passe :"
-msgstr "Password:"
-
-#: .\templates\emails\verification.html:45
+#: .\templates\emails\verification.html:42
 #: .\templates\emails\verification.txt:11
-msgid "Conservez ces informations en lieu sûr."
-msgstr "Keep this information in a safe place."
+msgid "Please keep this information secure."
+msgstr ""
 
-#: .\templates\emails\verification.html:49
-msgid "Pour activer votre compte, veuillez cliquer sur le lien ci-dessous :"
-msgstr "To activate your account, please click the link below:"
+#: .\templates\emails\verification.html:46
+#: .\templates\emails\verification.txt:14
+msgid "To activate your account, please click on the link below:"
+msgstr ""
 
-#: .\templates\emails\verification.html:54
+#: .\templates\emails\verification.html:51
+#, fuzzy
+#| msgid ""
+#| "Ce lien de sécurité expirera dans <span class=\"emphasis\">24 heures</"
+#| "span>."
 msgid ""
-"Ce lien de sécurité expirera dans <span class=\"emphasis\">24 heures</span>."
-msgstr "This security link will expire in <span class=\"emphasis\">24 hours</span>."
+"This security link will expire in <span class=\"emphasis\">24 hours</span>."
+msgstr ""
+"This security link will expire in <span class=\"emphasis\">24 hours</span>."
 
-#: .\templates\emails\verification.html:59
-msgid "&copy; 2026 FielMedina. Tous droits réservés."
+#: .\templates\emails\verification.html:55
+#, fuzzy
+#| msgid "&copy; 2026 FielMedina. Tous droits réservés."
+msgid "&copy; 2026 FielMedina. All rights reserved."
 msgstr "&copy; 2026 FielMedina. All rights reserved."
 
-#: .\templates\emails\verification.html:60
-msgid ""
-"Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet "
-"email."
-msgstr "If you did not make this request, you can ignore this email."
+#: .\templates\emails\verification.html:56
+msgid "If you did not make this request, you can safely ignore this email."
+msgstr ""
+
+#: .\templates\emails\verification.txt:2
+msgid "Hello"
+msgstr ""
 
 #: .\templates\emails\verification.txt:4
-msgid "Merci de vous être inscrit sur FielMedina !"
-msgstr "Thank you for registering on FielMedina!"
-
-#: .\templates\emails\verification.txt:9
-msgid "Mot de passe      :"
-msgstr "Password          :"
-
-#: .\templates\emails\verification.txt:14
-msgid "Pour activer votre compte, cliquez sur le lien ci-dessous :"
-msgstr "To activate your account, click the link below:"
+msgid "Thank you for joining FielMedina!"
+msgstr ""
 
 #: .\templates\emails\verification.txt:18
-msgid "Ce lien expirera dans 24 heures."
+#, fuzzy
+#| msgid "Ce lien expirera dans 24 heures."
+msgid "This link will expire in 24 hours."
 msgstr "This link will expire in 24 hours."
 
 #: .\templates\emails\verification.txt:20
-msgid "Si vous n'avez pas créé de compte, vous pouvez ignorer cet e-mail."
-msgstr "If you did not create an account, you can ignore this email."
+msgid "If you did not create an account, you can safely ignore this email."
+msgstr ""
 
 #: .\templates\emails\verification.txt:22
-msgid "L'équipe FielMedina"
+#, fuzzy
+#| msgid "L'équipe FielMedina"
+msgid "The FielMedina Team"
 msgstr "The FielMedina Team"
 
 #: .\templates\partners\dashboard.html:4
@@ -2992,3 +3000,77 @@ msgstr ""
 #: .\templates\partners\sidebar.html:79
 msgid "Paramètres"
 msgstr ""
+
+#: .\templates\verification_success.html:255
+msgid "Welcome, "
+msgstr ""
+
+#: .\templates\verification_success.html:259
+msgid ""
+"Your partner account has been successfully verified. You are now part of the "
+"FielMedina community."
+msgstr ""
+
+#: .\templates\verification_success.html:262
+msgid "Your partner account has been successfully verified."
+msgstr ""
+
+#: .\templates\verification_success.html:263
+msgid "Access to partner features"
+msgstr ""
+
+#: .\templates\verification_success.html:264
+msgid "Visibility on the platform"
+msgstr ""
+
+#: .\templates\verification_success.html:267
+msgid "Access the platform"
+msgstr ""
+
+#: .\templates\verification_success.html:269
+#, fuzzy
+#| msgid "&copy; 2026 FielMedina. Tous droits réservés."
+msgid "© 2026 FielMedina · All rights reserved."
+msgstr "&copy; 2026 FielMedina. All rights reserved."
+
+#~ msgid "Vérification de votre compte"
+#~ msgstr "Account Verification"
+
+#~ msgid "Activation du compte partenaire"
+#~ msgstr "Partner account activation"
+
+#~ msgid ""
+#~ "Merci de vous être inscrit sur notre plateforme de gestion de partenaires."
+#~ msgstr "Thank you for registering on our partner management platform."
+
+#~ msgid "Vos identifiants de connexion :"
+#~ msgstr "Your login credentials:"
+
+#~ msgid "Nom d'utilisateur :"
+#~ msgstr "Username:"
+
+#~ msgid "Mot de passe :"
+#~ msgstr "Password:"
+
+#~ msgid "Conservez ces informations en lieu sûr."
+#~ msgstr "Keep this information in a safe place."
+
+#~ msgid "Pour activer votre compte, veuillez cliquer sur le lien ci-dessous :"
+#~ msgstr "To activate your account, please click the link below:"
+
+#~ msgid ""
+#~ "Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet "
+#~ "email."
+#~ msgstr "If you did not make this request, you can ignore this email."
+
+#~ msgid "Merci de vous être inscrit sur FielMedina !"
+#~ msgstr "Thank you for registering on FielMedina!"
+
+#~ msgid "Mot de passe      :"
+#~ msgstr "Password          :"
+
+#~ msgid "Pour activer votre compte, cliquez sur le lien ci-dessous :"
+#~ msgstr "To activate your account, click the link below:"
+
+#~ msgid "Si vous n'avez pas créé de compte, vous pouvez ignorer cet e-mail."
+#~ msgstr "If you did not create an account, you can ignore this email."

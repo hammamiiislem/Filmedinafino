@@ -111,7 +111,7 @@ def send_validation_email(partner, plain_password=None, lang='fr'):
     context = {
         'company_name': partner.name,
         'verification_url': verify_url,
-        'username': getattr(partner, 'username', None) or partner.name,  # ← CORRIGÉ
+        'username': getattr(partner, 'username', None) or partner.name,
         'password': plain_password,
         'icon_url': f"{settings.SITE_URL}/static/icon.png",
     }   

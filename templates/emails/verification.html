@@ -20,46 +20,40 @@
 </head>
 <body>
 {% load i18n static %}
-
 <div class="container">
-
     <div class="brand-header">
         <img src="{{ site_url }}/static/icon.png" alt="FielMedina" style="width:56px; height:56px; border-radius:10px; display:block; margin:0 auto 18px auto;">
-        <h1>{% trans "Vérification de votre compte" %}</h1>
-        <p>{% trans "Activation du compte partenaire" %}</p>
+        <h1>{% trans "Verify your account" %}</h1>
+        <p>{% trans "Partner account activation" %}</p>
     </div>
-
     <div class="content">
-        <p>{% blocktrans %}Bonjour <strong>{{ company_name }}</strong>,{% endblocktrans %}</p>
-        <p>{% trans "Merci de vous être inscrit sur notre plateforme de gestion de partenaires." %}</p>
-
+        <p>{% blocktrans %}Hello <strong>{{ company_name }}</strong>,{% endblocktrans %}</p>
+        <p>{% trans "Thank you for registering on our partner management platform." %}</p>
+        
         {% if username or password %}
         <div style="background:#f8f4ff; border:1px solid #6c5ce7; border-radius:8px; padding:15px; margin:20px 0; text-align:left;">
-            <p style="margin:0 0 8px 0; font-weight:bold; color:#6c5ce7;">{% trans "Vos identifiants de connexion :" %}</p>
+            <p style="margin:0 0 8px 0; font-weight:bold; color:#6c5ce7;">{% trans "Your login credentials:" %}</p>
             {% if username %}
-            <p style="margin:4px 0;"><strong>{% trans "Nom d'utilisateur :" %}</strong> {{ username }}</p>
+            <p style="margin:4px 0;"><strong>{% trans "Username:" %}</strong> {{ username }}</p>
             {% endif %}
             {% if password %}
-            <p style="margin:4px 0;"><strong>{% trans "Mot de passe :" %}</strong> {{ password }}</p>
+            <p style="margin:4px 0;"><strong>{% trans "Password:" %}</strong> {{ password }}</p>
             {% endif %}
-            <p style="margin:8px 0 0 0; font-size:12px; color:#636e72;">{% trans "Conservez ces informations en lieu sûr." %}</p>
+            <p style="margin:8px 0 0 0; font-size:12px; color:#636e72;">{% trans "Please keep this information secure." %}</p>
         </div>
         {% endif %}
 
-        <p>{% trans "Pour activer votre compte, veuillez cliquer sur le lien ci-dessous :" %}</p>
+        <p>{% trans "To activate your account, please click on the link below:" %}</p>
         <p>
             <a href="{{ verification_url }}" class="verify-link">{{ verification_url }}</a>
         </p>
         <p style="margin-top: 20px; font-size: 14px; color: #636e72;">
-            {% blocktrans %}Ce lien de sécurité expirera dans <span class="emphasis">24 heures</span>.{% endblocktrans %}
+            {% blocktrans %}This security link will expire in <span class="emphasis">24 hours</span>.{% endblocktrans %}
         </p>
     </div>
-
     <div class="footer">
-        <p>{% trans "&copy; 2026 FielMedina. Tous droits réservés." %}</p>
-        <p>{% trans "Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet email." %}</p>
+        <p>{% trans "&copy; 2026 FielMedina. All rights reserved." %}</p>
+        <p>{% trans "If you did not make this request, you can safely ignore this email." %}</p>
     </div>
-
 </div>
 </body>
-</html>

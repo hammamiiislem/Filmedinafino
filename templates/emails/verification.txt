@@ -1,23 +1,23 @@
 {% load i18n %}{% autoescape off %}
-Bonjour {{ company_name }},
+{% trans "Hello" %} {{ company_name }},
 
-{% trans "Merci de vous être inscrit sur FielMedina !" %}
+{% trans "Thank you for joining FielMedina!" %}
 
 {% if username or password %}
-{% trans "Vos identifiants de connexion :" %}
-{% if username %}  {% trans "Nom d'utilisateur :" %} {{ username }}{% endif %}
-{% if password %}  {% trans "Mot de passe      :" %} {{ password }}{% endif %}
+{% trans "Your login credentials:" %}
+{% if username %}  {% trans "Username:" %} {{ username }}{% endif %}
+{% if password %}  {% trans "Password:" %} {{ password }}{% endif %}
 
-{% trans "Conservez ces informations en lieu sûr." %}
+{% trans "Please keep this information secure." %}
 {% endif %}
 
-{% trans "Pour activer votre compte, cliquez sur le lien ci-dessous :" %}
+{% trans "To activate your account, please click on the link below:" %}
 
 {{ verification_url }}
 
-{% trans "Ce lien expirera dans 24 heures." %}
+{% trans "This link will expire in 24 hours." %}
 
-{% trans "Si vous n'avez pas créé de compte, vous pouvez ignorer cet e-mail." %}
+{% trans "If you did not create an account, you can safely ignore this email." %}
 
-{% trans "L'équipe FielMedina" %}
+{% trans "The FielMedina Team" %}
 {% endautoescape %}
