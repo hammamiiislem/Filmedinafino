@@ -173,7 +173,7 @@ else:
         "https://www.fielmedina.com",
     ]
     ALLOWED_HOSTS = [
-        "mystory.fielmedina.com"
+        "mystory.fielmedina.com",
         "fielmedina.onrender.com", 
         ]
     DATABASES = {
