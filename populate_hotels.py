@@ -74,35 +74,44 @@ def populate():
         print("Country Tunisia not found. Please ensure cities_light data is loaded.")
         return
 
-    # 2. Get or Create Category "Hotels"
-    hotel_category, created = LocationCategory.objects.get_or_create(name="Hotels")
-    if created:
-        print(f"Created category: {hotel_category.name}")
+    # 2. Categories dictionary (NEW)
+    categories = {
+        "hotel": "Hotels",
+        "restaurant": "Restaurants",
+        "cafe": "Cafes",
+        "maison_hote": "Maisons d'hôte"
+    }
 
-    # 3. Iterate and Create Locations
+    # 3. Get or create category objects
+    category_objects = {}
+    for key, name in categories.items():
+        obj, created = LocationCategory.objects.get_or_create(name=name)
+        category_objects[key] = obj
+        if created:
+            print(f"Created category: {name}")
+
+    # 4. Iterate and Create Locations
     for city_name, hotels in hotel_data.items():
         city = City.objects.filter(country=tunisia, name__iexact=city_name).first()
-        
-        # Aggressive search for Zaghouan if not found
+
         if not city and city_name == "zaghouan":
             city = City.objects.filter(country=tunisia, name__icontains="Zag").first()
             if not city:
-                # Last resort: Create the city if it's missing in cities_light
                 city = City.objects.create(name="Zaghouan", country=tunisia)
                 print(f"Created missing city: {city.name}")
 
         if not city:
             print(f"City '{city_name}' not found in database. Skipping.")
             continue
-        
+
         print(f"Processing city: {city.name}")
+
         for hotel_name in hotels:
-            # Avoid duplicates by name and city
             loc, created = Location.objects.update_or_create(
                 name=hotel_name,
                 city=city,
                 defaults={
-                    'category': hotel_category,
+                    'category': category_objects["hotel"],  # 🔥 هنا التغيير المهم
                     'country': tunisia,
                     'latitude': 0.0,
                     'longitude': 0.0,
@@ -112,6 +121,7 @@ def populate():
                     'story_fr': f"Description pour {hotel_name} à {city.name}.",
                 }
             )
+
             if created:
                 print(f"  + Added: {hotel_name}")
             else:
@@ -119,4 +129,4 @@ def populate():
 
 if __name__ == "__main__":
     populate()
-    print("Population completed.")
+    print("Population completed.")
