@@ -1,44 +1,24 @@
-{% extends 'guard/base/index.html' %} {# Layout principal dashboard #}
-{% load i18n %} {# Traduction #}
+{% extends 'guard/base/index.html' %}
+{% load i18n %}
 
 {% block title %}{% trans "Delete Partner" %}{% endblock title %}
 
 {% block body %}
-
-{# CONTAINER UI (card) #}
-<div class="bg-white ... p-6">
-
-    {# Titre #}
-    <h1 class="text-2xl font-bold ...">
-        {% trans "Delete Partner" %}
-    </h1>
-
-    {# MESSAGE dynamique avec nom partenaire #}
-    <p class="...">
-        {# IMPORTANT : blocktrans يسمح بإدخال variable داخل traduction #}
-        {% blocktrans with name=object.name %}
-            Are you sure you want to delete "{{ name }}"?
-        {% endblocktrans %}
+<div class="bg-white dark:bg-gray-800 shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl p-6">
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{% trans "Delete Partner" %}</h1>
+    <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">
+        {% blocktrans with name=object.name %}Are you sure you want to delete "{{ name }}"?{% endblocktrans %}
     </p>
-
-    {# FORM DELETE #}
     <form method="post">
-        {% csrf_token %} {# 🔥 obligatoire pour sécurité (POST) #}
-
+        {% csrf_token %}
         <div class="flex items-center gap-3">
-
-            {# CANCEL → navigation فقط (ما يعملش delete) #}
-            <a href="{% url 'guard:partnersList' %}" class="...">
+            <a href="{% url 'guard:partnersList' %}" class="text-body bg-neutral-secondary-medium box-border border border-default-medium hover:bg-neutral-tertiary-medium hover:text-heading focus:ring-4 focus:ring-neutral-tertiary shadow-xs font-medium leading-5 rounded-full text-sm px-4 py-2.5 focus:outline-none">
                 {% trans "Cancel" %}
             </a>
-
-            {# SUBMIT → déclenche suppression côté backend #}
-            <button type="submit" class="...">
+            <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:ring-red-300 dark:focus:ring-red-800">
                 {% trans "Delete" %}
             </button>
-
         </div>
     </form>
 </div>
-
 {% endblock body %}

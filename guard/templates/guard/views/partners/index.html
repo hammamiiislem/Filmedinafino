@@ -1,8 +1,7 @@
-{% extends 'guard/base/index.html' %} {# Héritage du layout principal (structure globale dashboard) #}
-{% load i18n %} {# Activation du système de traduction Django #}
+{% extends 'guard/base/index.html' %}
+{% load i18n %}
 
 {% block title %}
-    {# Titre dynamique : Add ou Edit selon si object existe (mode update vs create) #}
     {% if object %}{% trans "Edit Partner" %}{% else %}{% trans "Add Partner" %}{% endif %}
 {% endblock title %}
 
@@ -10,168 +9,271 @@
 <div class="flex justify-between items-start mb-6">
     <div>
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-            {# نفس logique du titre pour afficher context utilisateur #}
             {% if object %}{% trans "Edit Partner" %}{% else %}{% trans "Add Partner" %}{% endif %}
         </h1>
         <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
             {% trans "Upload a 300x200 logo and provide details." %}
         </p>
     </div>
-
-    {# Navigation : retour vers liste partenaires (UX مهم) #}
-    <a href="{% url 'guard:partnersList' %}" class="...">
+    <a href="{% url 'guard:partnersList' %}" class="text-body bg-neutral-secondary-medium box-border border border-default-medium hover:bg-neutral-tertiary-medium hover:text-heading focus:ring-4 focus:ring-neutral-tertiary shadow-xs font-medium leading-5 rounded-full text-sm px-4 py-2.5 focus:outline-none">
         {% trans "Back to list" %}
     </a>
 </div>
 
-{# IMPORTANT : enctype obligatoire pour upload image #}
 <form action="" method="post" enctype="multipart/form-data" class="space-y-6">
-    {% csrf_token %} {# Protection CSRF obligatoire en POST #}
+    {% csrf_token %}
     
-    {# Gestion erreurs globales (backend validation) #}
     {% if form.non_field_errors %}
-        <div class="...">
-            {% for error in form.non_field_errors %}
-                <div>{{ error }}</div>
-            {% endfor %}
+        <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+            {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
         </div>
     {% endif %}
 
-    <div class="bg-white ...">
+    <div class="bg-white dark:bg-gray-800 shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
         <div class="px-4 py-5 sm:p-6 space-y-6">
-
-            {# Champ NAME #}
             <div>
-                <label for="{{ form.name.id_for_label }}">
-                    {# * يظهر فقط إذا champ obligatoire #}
-                    {{ form.name.label }}{% if form.name.field.required %}<span>*</span>{% endif %}
+                <label for="{{ form.name.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    {{ form.name.label }}{% if form.name.field.required %}<span class="text-red-600">*</span>{% endif %}
                 </label>
-
-                {{ form.name }} {# Render input automatique Django #}
-
-                {# Affichage erreur spécifique champ #}
-                {% if form.name.errors %}
-                    <p>{{ form.name.errors.0 }}</p>
-                {% endif %}
+                {{ form.name }}
+                {% if form.name.errors %}<p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ form.name.errors.0 }}</p>{% endif %}
             </div>
 
-            {# Champ EMAIL (validation importante côté backend normalement) #}
             <div>
-                <label for="{{ form.email.id_for_label }}">
-                    {% trans "Email Address" %}
-                    {% if form.email.field.required %}<span>*</span>{% endif %}
+                <label for="{{ form.email.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    {% trans "Email Address" %}{% if form.email.field.required %}<span class="text-red-600">*</span>{% endif %}
                 </label>
-
                 {{ form.email }}
-
-                {% if form.email.errors %}
-                    <p>{{ form.email.errors.0 }}</p>
-                {% endif %}
+                {% if form.email.errors %}<p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ form.email.errors.0 }}</p>{% endif %}
             </div>
 
-            {# Champ LINK (URL partenaire) #}
             <div>
-                <label for="{{ form.link.id_for_label }}">
-                    {{ form.link.label }}{% if form.link.field.required %}<span>*</span>{% endif %}
+                <label for="{{ form.link.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    {{ form.link.label }}{% if form.link.field.required %}<span class="text-red-600">*</span>{% endif %}
                 </label>
-
                 {{ form.link }}
-
-                {% if form.link.errors %}
-                    <p>{{ form.link.errors.0 }}</p>
-                {% endif %}
+                {% if form.link.errors %}<p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ form.link.errors.0 }}</p>{% endif %}
             </div>
 
-            {# Upload IMAGE (point critique) #}
             <div>
-                <label for="{{ form.image.id_for_label }}">
-                    {{ form.image.label }}
-                    {% if form.image.field.required %}<span>*</span>{% endif %}
-                    <span>(300x200)</span>
+                <label for="{{ form.image.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    {{ form.image.label }}{% if form.image.field.required %}<span class="text-red-600">*</span>{% endif %}
+                    <span class="ml-1 text-xs text-gray-500 dark:text-gray-400">(300x200)</span>
                 </label>
-
                 {{ form.image }}
-
-                {# IMPORTANT : preview image seulement en mode EDIT #}
                 {% if object.image %}
                     <div class="mt-3">
-                        <img src="{{ object.image.url }}" class="h-24 w-36 object-cover">
+                        <img src="{{ object.image.url }}" class="h-24 w-36 object-cover rounded border border-gray-200">
                     </div>
                 {% endif %}
-
-                {% if form.image.errors %}
-                    <p>{{ form.image.errors.0 }}</p>
-                {% endif %}
+                {% if form.image.errors %}<p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ form.image.errors.0 }}</p>{% endif %}
             </div>
 
-            {# SECTION LOCATIONS (relation ManyToMany) #}
-            <div class="border-t ... pt-6">
-                <label class="block mb-3">
-                    {{ form.locations.label }}
-                </label>
-                
-                {# Vérifie s'il y a des localisations en base #}
-                {% if form.locations.field.queryset.exists %}
-                    
-                    <div class="grid ...">
-                        {# Boucle sur chaque checkbox généré par Django #}
-                        {% for checkbox in form.locations %}
-                            <div class="flex items-center gap-2">
-                                
-                                {# CUSTOM checkbox (au lieu de {{ checkbox.tag }}) #}
-                                <input type="checkbox"
-                                    name="{{ checkbox.data.name }}"
-                                    value="{{ checkbox.data.value }}"
-                                    id="{{ checkbox.id_for_label }}"
-                                    {% if checkbox.data.selected %}checked{% endif %}>
+          <div id="locations-section" class="border-t border-gray-200 dark:border-gray-700 pt-6">
+    <label class="block mb-3 text-sm font-medium text-gray-900 dark:text-white">
+        {{ form.locations.label }}
+    </label>
 
-                                <label for="{{ checkbox.id_for_label }}">
-                                    {{ checkbox.choice_label }}
-                                </label>
-                            </div>
-                        {% endfor %}
-                    </div>
-
-                {% else %}
-                    {# Cas critique : aucune localisation disponible #}
-                    <div class="...">
-                        {% trans "Aucune localisation disponible pour le moment..." %}
-                    </div>
-                {% endif %}
-
-                {# Help text dynamique (si défini dans form.py) #}
-                {% if form.locations.help_text %}
-                    <p>{{ form.locations.help_text }}</p>
-                {% endif %}
-
-                {# Erreurs validation ManyToMany #}
-                {% if form.locations.errors %}
-                    {% for error in form.locations.errors %}
-                        <p>{{ error }}</p>
-                    {% endfor %}
-                {% endif %}
+    {# city + category filters — JS يملّيهم #}
+    <div id="location-filters" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <div>
+            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans "City" %}</label>
+            <select id="filter-city" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                <option value="">— {% trans "Select city" %} —</option>
+            </select>
+        </div>
+        <div class="relative">
+            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{% trans "Category" %}</label>
+            <div id="category-wrapper" class="relative">
+                <button type="button" id="category-btn" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 flex justify-between items-center w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-left">
+                    <span id="category-btn-text" class="truncate block">— {% trans "Select categories" %} —</span>
+                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+                <div id="category-dropdown" class="hidden absolute z-10 w-full bg-white rounded-lg shadow dark:bg-gray-700 mt-1 max-h-60 overflow-y-auto border border-gray-200 dark:border-gray-600">
+                    <ul class="p-3 space-y-2 text-sm text-gray-700 dark:text-gray-200" id="filter-category-list">
+                    </ul>
+                </div>
             </div>
-
         </div>
     </div>
 
-    {# ACTIONS FORM (UX important) #}
-    <div class="flex items-center justify-end gap-x-3 border-t pt-6">
+   {# hidden inputs للـ form submit #}
+    <input type="hidden" id="selected-city-id"     name="city">
+    <input type="hidden" id="selected-category-id" name="category">
 
-        {# Cancel = navigation sans submit #}
-        <a href="{% url 'guard:partnersList' %}">
+    {# locations checkboxes — JS يملّيهم #}
+    <div id="locations-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600" style="display:none">
+    </div>
+
+    {% if form.locations.errors %}
+        {% for error in form.locations.errors %}
+            <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ error }}</p>
+        {% endfor %}
+    {% endif %}
+</div>
+
+    <div class="flex items-center justify-end gap-x-3 border-t border-gray-900/10 pt-6">
+        <a href="{% url 'guard:partnersList' %}" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:text-white dark:border-gray-600">
             {% trans "Cancel" %}
         </a>
-
-        {# Submit dynamique (Create vs Update) #}
-        <button type="submit">
-            {% if object %}
-                {% trans "Update Partner" %}
-            {% else %}
-                {% trans "Save Partner" %}
-            {% endif %}
+        <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
+            {% if object %}{% trans "Update Partner" %}{% else %}{% trans "Save Partner" %}{% endif %}
         </button>
     </div>
 </form>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const citySelect     = document.getElementById('filter-city');
+    const locContainer   = document.getElementById('locations-container');
+    const hiddenCity     = document.getElementById('selected-city-id');
+    const hiddenCategory = document.getElementById('selected-category-id');
+
+    const catBtn         = document.getElementById('category-btn');
+    const catBtnText     = document.getElementById('category-btn-text');
+    const catDropdown    = document.getElementById('category-dropdown');
+    const catList        = document.getElementById('filter-category-list');
+    
+    let selectedCategories = new Set();
+    let categoriesData   = [];
+
+    const preselectedStr = "{% if object %}{% for loc in object.locations.all %}{{ loc.id }},{% endfor %}{% endif %}";
+    const preselected = new Set(preselectedStr.split(',').filter(Boolean).map(Number));
+    
+    const preselectedCatsStr = "{% if object %}{% for loc in object.locations.all %}{{ loc.category_id }},{% endfor %}{% endif %}";
+    const preselectedCats = new Set(preselectedCatsStr.split(',').filter(Boolean).map(String));
+
+    // Toggle dropdown
+    catBtn.addEventListener('click', () => {
+        catDropdown.classList.toggle('hidden');
+    });
+
+    // Close on click outside
+    document.addEventListener('click', (e) => {
+        const wrapper = document.getElementById('category-wrapper');
+        if (wrapper && !wrapper.contains(e.target)) {
+            catDropdown.classList.add('hidden');
+        }
+    });
+
+    function updateCategoryButtonText() {
+        if (selectedCategories.size === 0) {
+            catBtnText.textContent = '— {% trans "Select categories" %} —';
+        } else {
+            const names = Array.from(selectedCategories).map(id => {
+                const c = categoriesData.find(cat => cat.id == id);
+                return c ? c.name : '';
+            }).filter(Boolean);
+            catBtnText.textContent = names.join(', ');
+        }
+    }
+
+    function fetchFilteredLocations() {
+        hiddenCategory.value = Array.from(selectedCategories).join(',');
+        
+        if (!citySelect.value || selectedCategories.size === 0) {
+             locContainer.style.display = 'none';
+             locContainer.innerHTML = '';
+             return;
+        }
+
+        locContainer.style.display = 'grid';
+        locContainer.innerHTML = '<p class="text-sm text-gray-500 col-span-2">Loading...</p>';
+
+        const catQuery = Array.from(selectedCategories).map(id => `category=${id}`).join('&');
+        fetch(`{% url 'guard:ajax_locations' %}?city=${citySelect.value}&${catQuery}`)
+            .then(r => r.json())
+            .then(data => {
+                if (!data.length) {
+                    locContainer.innerHTML = '<p class="text-sm text-yellow-700 col-span-2">{% trans "No locations found." %}</p>';
+                    return;
+                }
+                locContainer.innerHTML = data.map(loc => {
+                    const checked = preselected.has(loc.id) ? 'checked' : '';
+                    const label   = loc.name_en || loc.name_fr || '';
+                    return `
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox"
+                                name="locations"
+                                value="${loc.id}"
+                                id="loc_${loc.id}"
+                                ${checked}
+                                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
+                            <label for="loc_${loc.id}" class="text-sm text-gray-700 dark:text-gray-300 cursor-pointer select-none">
+                                ${label}
+                            </label>
+                        </div>`;
+                }).join('');
+            })
+            .catch(() => {
+                locContainer.innerHTML = '<p class="text-sm text-red-500 col-span-2">{% trans "Error loading locations." %}</p>';
+            });
+    }
+
+    // ── حمّل cities ─────────────────────────────────────────────
+    fetch('{% url "guard:ajax_cities" %}')
+        .then(r => r.json())
+        .then(data => {
+            data.forEach(c => citySelect.add(new Option(c.name, c.id)));
+            
+            const firstCityId = "{{ object.locations.first.city_id|default:'' }}";
+            if (firstCityId) {
+                citySelect.value = firstCityId;
+            }
+        });
+
+    // ── حمّل categories ─────────────────────────────────────────
+    fetch('{% url "guard:ajax_categories" %}')
+        .then(r => r.json())
+        .then(data => {
+            categoriesData = data;
+            catList.innerHTML = data.map(c => `
+                <li>
+                    <div class="flex items-center p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">
+                        <input id="cat_${c.id}" type="checkbox" value="${c.id}" class="category-checkbox w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                        <label for="cat_${c.id}" class="w-full ml-2 text-sm font-medium text-gray-900 rounded dark:text-gray-300 cursor-pointer">${c.name}</label>
+                    </div>
+                </li>
+            `).join('');
+
+            document.querySelectorAll('.category-checkbox').forEach(cb => {
+                cb.addEventListener('change', function() {
+                    if (this.checked) selectedCategories.add(this.value);
+                    else selectedCategories.delete(this.value);
+                    
+                    updateCategoryButtonText();
+                    fetchFilteredLocations();
+                });
+            });
+
+            if (preselectedCats.size > 0) {
+                catBtn.disabled = false;
+                preselectedCats.forEach(id => {
+                    const cb = document.getElementById(`cat_${id}`);
+                    if (cb) {
+                        cb.checked = true;
+                        selectedCategories.add(id);
+                    }
+                });
+                updateCategoryButtonText();
+                if (citySelect.value) fetchFilteredLocations();
+            }
+        });
+
+    // ── city change ──────────────────────────────────────────────
+    citySelect.addEventListener('change', function () {
+        hiddenCity.value = this.value;
+        
+        if (!this.value) {
+            selectedCategories.clear();
+            document.querySelectorAll('.category-checkbox').forEach(cb => cb.checked = false);
+            updateCategoryButtonText();
+            fetchFilteredLocations();
+        } else {
+            fetchFilteredLocations();
+        }
+    });
+});
+</script>
+
 
 {% endblock body %}

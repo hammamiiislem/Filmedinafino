@@ -578,13 +578,24 @@ class PartnerForm(FlowbiteFormMixin, forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # En mode "Edit", on pré-coche toutes les locations déjà liées
+
         if self.instance.pk:
             self.fields['locations'].initial = self.instance.locations.all()
-            # En mode Edit, on cache le champ password
             self.fields['password'].widget = forms.HiddenInput()
 
+            self.fields['locations'].queryset = Location.objects.none()
 
+            if 'city' in self.data and 'category' in self.data:
+                try:
+                    city = self.data.get('city')
+                    category = self.data.get('category')
+
+                    self.fields['locations'].queryset = Location.objects.filter(
+                        city_id=city,
+                        category__name=category
+                    )
+                except:
+                    pass
             
 class SponsorForm(FlowbiteFormMixin, forms.ModelForm):
     class Meta:

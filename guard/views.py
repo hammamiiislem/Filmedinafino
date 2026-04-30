@@ -8,7 +8,9 @@ from shared.utils import send_validation_email
 import threading
 import secrets
 import string
-
+from django.http import JsonResponse
+from .models import Location
+from .models import LocationCategory
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -1309,3 +1311,39 @@ class ReceiptListView(StaffRequiredMixin, LoginRequiredMixin, ListView):
         context['q']            = self.request.GET.get('q', '')
         context['payment_type'] = self.request.GET.get('payment_type', '')
         return context
+
+
+@login_required
+def load_locations(request):
+    city = request.GET.get("city")
+    categories = request.GET.getlist("category")
+    
+    # In case it's passed as a comma-separated string
+    if len(categories) == 1 and ',' in categories[0]:
+        categories = categories[0].split(',')
+
+    locations = Location.objects.all()
+
+    if city:
+        locations = locations.filter(city_id=city)
+
+    if categories:
+        category_ids = [c.strip() for c in categories if c.strip()]
+        if category_ids:
+            locations = locations.filter(category_id__in=category_ids)
+
+    data = list(locations.values("id", "name_en", "name_fr"))
+    return JsonResponse(data, safe=False)
+
+
+@login_required
+def get_categories(request):
+  
+    data = list(LocationCategory.objects.values("id", "name"))
+    return JsonResponse(data, safe=False)
+
+@login_required
+def get_cities_with_locations(request):
+    from cities_light.models import City
+    cities = City.objects.all().values("id", "name")
+    return JsonResponse(list(cities), safe=False)
