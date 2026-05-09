@@ -6,6 +6,7 @@ from guard.models import GuardUser, Location
 from guard.services import EmailVerificationService
 from .models import Partner
 
+# class pour la creation des partenaires
 class PartnerService:
     @staticmethod
     @transaction.atomic
@@ -38,7 +39,7 @@ class PartnerService:
         send_verification_email_task.delay(user.id, raw_token)
 
         return partner
-
+# class pour l'ajout des lieux
 class LocationService:
     @staticmethod
     def add_location_to_partner(partner_id, name, city_id=None, country_id=None, category_id=None, latitude=0, longitude=0):

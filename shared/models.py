@@ -303,7 +303,7 @@ class Transaction(models.Model):
         verbose_name = _("Transaction")
         verbose_name_plural = _("Transactions")
 # ── À ajouter à la fin de shared/models.py ───────────────────────────────────
-
+# clase pour les prix configurables depuis l'admin Django
 class PricingSettings(models.Model):
     """
     Singleton — pk=1 toujours.

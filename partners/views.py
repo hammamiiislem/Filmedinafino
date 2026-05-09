@@ -493,7 +493,7 @@ def toggle_account(request):
 
 
 # ── Coupon AJAX ───────────────────────────────────────────────────────────────
-
+# pour la verification du code coupon
 def coupon_verify(request):
     code     = request.GET.get('code', '').strip().upper()
     category = request.GET.get('category', 'both')

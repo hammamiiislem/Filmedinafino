@@ -131,8 +131,9 @@ urlpatterns = [
     path("ad/<int:pk>/go/",    AdClickView.as_view(),    name="ad_click"),
     path("event/<int:pk>/go/", EventClickView.as_view(), name="event_click"),
     path("api/locations/filter/", load_locations, name="ajax_locations"),
-path("api/categories/", get_categories, name="ajax_categories"),
+    path("api/categories/", get_categories, name="ajax_categories"),
 path("api/cities/filter/", get_cities_with_locations, name="ajax_cities"), 
+
     path(
         "settings/pricing/",
         PricingSettingsView.as_view(),

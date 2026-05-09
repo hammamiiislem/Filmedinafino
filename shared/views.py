@@ -280,7 +280,7 @@ def translate_text(request):
 # =============================================================================
 # Ajoute cette vue dans views.py
 # =============================================================================
-
+#class pour le dashboard des partenaires
 class AdminPartnersDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     template_name = "guard/views/partners/partials/adminpartnersdashboard.html"
 

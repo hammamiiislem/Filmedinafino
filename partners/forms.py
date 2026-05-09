@@ -11,7 +11,7 @@ from .models import (
 )
 
 # ── Actions ───────────────────────────────────────────────────────────────────
-
+# action pour approuver le changement d'email
 def approve_email_change(modeladmin, request, queryset):
     count = 0
     for partner in queryset.filter(pending_email__isnull=False):

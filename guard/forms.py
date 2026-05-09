@@ -68,7 +68,7 @@ class FlowbiteFormMixin:
             
             widget.attrs["class"] = f"{classes} {base_class}".strip()
             widget.attrs.setdefault("id", f"id_{name}")
-
+# location form for admin 
 class LocationForm(FlowbiteFormMixin, forms.ModelForm):
     name_en = forms.CharField(
         label=_("Name (English)"),
@@ -547,7 +547,7 @@ class AdForm(forms.ModelForm):
                     % {"w": w, "h": h}
                 )
         return image
-
+# old partner form
 class PartnerForm(FlowbiteFormMixin, forms.ModelForm):
     locations = forms.ModelMultipleChoiceField(
         queryset=Location.objects.all(),
@@ -578,13 +578,13 @@ class PartnerForm(FlowbiteFormMixin, forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
+        # if partner is updating set initial values
         if self.instance.pk:
             self.fields['locations'].initial = self.instance.locations.all()
             self.fields['password'].widget = forms.HiddenInput()
 
             self.fields['locations'].queryset = Location.objects.none()
-
+            # filter locations by city and category
             if 'city' in self.data and 'category' in self.data:
                 try:
                     city = self.data.get('city')

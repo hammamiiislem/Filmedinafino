@@ -3,7 +3,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.conf import settings
 from .models import GuardUser
-
+# envoie des emails pour activer le compte partenaire
 @shared_task(bind=True, max_retries=3)
 def send_verification_email_task(self, user_id, raw_token):
     try:

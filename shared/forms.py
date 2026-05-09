@@ -11,7 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from tinymce.widgets import TinyMCE
 from .models import UserProfile, Page
 
-
+# classe pour l'application des class flowbite
 class FlowbiteFormMixin:
     input_class = (
         "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg "
@@ -31,7 +31,7 @@ class FlowbiteFormMixin:
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
+        # on applique les class flowbite sur les champs du formulaire
         for name, field in self.fields.items():
             widget = field.widget
             classes = widget.attrs.get("class", "")

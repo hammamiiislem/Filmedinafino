@@ -1,14 +1,16 @@
 import strawberry
 from .services import EmailVerificationService
 from core.exceptions import DomainException
-
+# classe pour les payloads des utilisateurs --------------------------------------------------------
 @strawberry.type
 class VerificationPayload:
     success: bool
     message: str
+# --------------------------------------------------------
 
 @strawberry.type
 class Mutation:
+    # verifier le token 
     @strawberry.mutation
     def verify_email(self, token: str) -> VerificationPayload:
         try:
@@ -22,7 +24,7 @@ class Mutation:
                 success=False, 
                 message=str(e)
             )
-            
+         # envoie de nouveau token   
     @strawberry.mutation
     def resend_verification_email(self, email: str) -> VerificationPayload:
         # On utilise le service qui est enumeration-safe

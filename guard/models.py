@@ -134,6 +134,8 @@ class ImageEvent(OptimizedImageModel):
 # =============================================================================
 # LOCATION
 # =============================================================================
+
+# classe pour les catégories de locations
 class LocationCategory(models.Model):
     name       = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -182,7 +184,7 @@ class Location(models.Model):
         verbose_name=_("Category")
     )
     
-    # Raje3na el partner hna bch el GraphQL yal9ah
+    # le partner qui a cree la location 
     partner = models.ForeignKey(
         'partners.Partner', 
         on_delete=models.SET_NULL, 
@@ -209,10 +211,12 @@ class Location(models.Model):
         related_name="locations", 
         verbose_name=_("City")
     )
-    
+    #    longitude et latitude de la location 
     longitude    = models.DecimalField(max_digits=9, decimal_places=6)
     latitude     = models.DecimalField(max_digits=9, decimal_places=6)
+    # active ads 
     is_active_ads = models.BooleanField(default=False, verbose_name=_("Active Ads"))
+    # location story
     story        = HTMLField(verbose_name=_("Story"))
     
     openFrom     = models.TimeField(
@@ -227,6 +231,7 @@ class Location(models.Model):
         null=True, 
         help_text=_("Add opening hours if the location is open to a specific time")
     )
+    # admission fee 
     admissionFee = models.DecimalField(
         max_digits=10, 
         decimal_places=2, 
@@ -495,6 +500,7 @@ class PublicTransportTime(models.Model):
 # =============================================================================
 # PARTNER & SPONSOR
 # =============================================================================
+# old partner model
 class LegacyPartner(models.Model):
     name = models.CharField(max_length=255, verbose_name=_("Name"))
     
@@ -664,7 +670,7 @@ class NotificationLog(models.Model):
 
 
 class GuardUser(AbstractBaseUser, PermissionsMixin, UUIDModel, TimeStampedModel):
-    # التغيير الأساسي: إضافة unique=True
+    # old version 
     username = models.CharField(max_length=150, unique=True, null=True, blank=True)
     email = models.EmailField(unique=True)
     is_staff = models.BooleanField(default=False)
@@ -676,16 +682,16 @@ class GuardUser(AbstractBaseUser, PermissionsMixin, UUIDModel, TimeStampedModel)
     REQUIRED_FIELDS = ['email']
 
     def __str__(self):
-        # تصليح: نضمنوا إنها ترجع string ديما
+        #string
         return self.username if self.username else self.email
 
-
+#class for email verification token
 class EmailVerificationToken(UUIDModel, TimeStampedModel):
     user = models.ForeignKey('GuardUser', on_delete=models.CASCADE, related_name='verification_tokens')
     token_hash = models.CharField(max_length=64, unique=True) # SHA-256 fait 64 caractères
     expires_at = models.DateTimeField()
     is_used = models.BooleanField(default=False)
-
+    #method to hash the token
     @staticmethod
     def hash_token(raw_token):
         return hashlib.sha256(raw_token.encode()).hexdigest()

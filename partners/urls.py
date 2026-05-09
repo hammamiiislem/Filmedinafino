@@ -38,5 +38,6 @@ urlpatterns = [
     path('account/toggle/',       views.toggle_account,      name='toggle_account'),
 
     # Coupon (AJAX)
+    # url pour la verification du code coupon
     path('coupon/verify/', views.coupon_verify, name='coupon_verify'),
 ]

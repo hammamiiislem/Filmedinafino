@@ -1065,10 +1065,13 @@ class AdsDashboardView(LoginRequiredMixin, TemplateView):
 # =============================================================================
 # PARTNERS
 # =============================================================================
+# url pour lister les partenaires
 class PartnerListView(UserPassesTestMixin, LoginRequiredMixin, ListView):
     model = LegacyPartner; template_name = "guard/views/partners/list.html"
     context_object_name = "partners"; ordering = ["-id"]
     def test_func(self): return self.request.user.is_staff
+
+# url pour ajouter un partenaire
 class PartnerCreateView(UserPassesTestMixin, LoginRequiredMixin, CreateView):
     model = LegacyPartner
     form_class = PartnerForm
@@ -1103,6 +1106,7 @@ class PartnerCreateView(UserPassesTestMixin, LoginRequiredMixin, CreateView):
 
         messages.success(self.request, _("Partner created successfully."))
         return HttpResponseRedirect(self.get_success_url())
+# url pour modifier un partenaire
 class PartnerUpdateView(UserPassesTestMixin, LoginRequiredMixin, UpdateView):
     model = LegacyPartner
     form_class = PartnerForm
@@ -1124,7 +1128,7 @@ class PartnerUpdateView(UserPassesTestMixin, LoginRequiredMixin, UpdateView):
 
         messages.success(self.request, _("Partner updated successfully."))
         return HttpResponseRedirect(self.get_success_url())
-
+# url pour supprimer un partenaire
 class PartnerDeleteView(UserPassesTestMixin, LoginRequiredMixin, SuccessMessageMixin, DeleteView):
     model = LegacyPartner; template_name = "guard/views/partners/delete.html"
     success_url = reverse_lazy("guard:partnersList"); success_message = _("Partner deleted successfully.")
@@ -1162,6 +1166,7 @@ class SponsorDeleteView(UserPassesTestMixin, LoginRequiredMixin, SuccessMessageM
 # =============================================================================
 # API HELPERS
 # =============================================================================
+# url pour charger les villes par pays
 @login_required
 def get_cities_by_country(request, country_id):
     from cities_light.models import City
@@ -1185,7 +1190,7 @@ def get_locations_by_city(request, city_id):
 
 
 
-
+# url pour la verification de l'email du partenaire
 def verify_partner_email(request):
     token = request.GET.get('token')
     if not token:
@@ -1312,7 +1317,7 @@ class ReceiptListView(StaffRequiredMixin, LoginRequiredMixin, ListView):
         context['payment_type'] = self.request.GET.get('payment_type', '')
         return context
 
-
+# url pour charger les lieux 
 @login_required
 def load_locations(request):
     city = request.GET.get("city")
@@ -1335,13 +1340,13 @@ def load_locations(request):
     data = list(locations.values("id", "name_en", "name_fr"))
     return JsonResponse(data, safe=False)
 
-
+# url pour recuperer les categories des lieux
 @login_required
 def get_categories(request):
   
     data = list(LocationCategory.objects.values("id", "name"))
     return JsonResponse(data, safe=False)
-
+# url pour recuperer les villes avec les lieux
 @login_required
 def get_cities_with_locations(request):
     from cities_light.models import City

@@ -14,7 +14,7 @@ from cities_light.models import City, Country
 class ErrorType:
     code: str
     message: str
-
+# classe pour les partenaires
 @strawberry_django.type(Partner)
 class PartnerType:
     id: strawberry.ID
@@ -25,17 +25,19 @@ class PartnerType:
     status: auto
     created_at: auto
 
+# classe pour les lieux
 @strawberry.field
 def locations(self, root) -> List["LocationType"]:
     from api.schema import LocationType
     return root.owned_locations.all()
 
+# class pour les payloads des partenaires
 @strawberry.type
 class PartnerPayload:
     partner: Optional[PartnerType] = None
     success: bool = True
     errors: Optional[List[ErrorType]] = None
-
+# class pour les payloads des lieux
 @strawberry.type
 class LocationPayload:
     location: Optional[strawberry.LazyType["LocationType", "api.schema"]] = None

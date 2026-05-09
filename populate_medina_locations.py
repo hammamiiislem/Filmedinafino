@@ -1,3 +1,4 @@
+# a ajouter pour les location dans la page partner 
 import os
 import django
 

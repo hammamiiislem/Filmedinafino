@@ -5,6 +5,7 @@ from core.decorators import handle_service_errors
 from core.exceptions import DomainException
 from .models import EmailVerificationToken
 
+# service pour l'activation des comptes partenaires
 class EmailVerificationService:
 
     @staticmethod
@@ -30,7 +31,7 @@ class EmailVerificationService:
         )
         
         return raw_token
-
+# verification du token 
     @staticmethod
     @handle_service_errors
     def verify_email(raw_token):
@@ -58,7 +59,7 @@ class EmailVerificationService:
         token_obj.save()
         
         return user
-
+# envoie de nouveau token
     @staticmethod
     @handle_service_errors
     def resend_verification(email):

@@ -6,7 +6,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.translation import activate
-
+# email pour activer le compte partenaire
 def send_partner_verification_email(partner, request):
     token = default_token_generator.make_token(partner)
     uid = urlsafe_base64_encode(force_bytes(partner.pk))

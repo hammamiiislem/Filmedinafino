@@ -98,7 +98,7 @@ def resize_to_fixed(image_field, size=(300, 200)):
         return None
 
 
-
+# pour l'envoie du mail de verification a ajouter
 def send_validation_email(partner, plain_password=None, lang='fr'):
     from django.core.mail import EmailMultiAlternatives
     from django.template.loader import render_to_string
